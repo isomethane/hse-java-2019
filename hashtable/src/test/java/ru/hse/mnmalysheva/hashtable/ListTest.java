@@ -17,7 +17,7 @@ class ListTest {
 
     @Test
     void addNullThrows() {
-        assertThrows(Throwable.class, () -> new List().add(null));
+        assertThrows(Throwable.class, () -> testList.add(null));
     }
 
     @Test
@@ -250,7 +250,7 @@ class ListTest {
 
     @Test
     void canClearEmptyList() {
-        assertDoesNotThrow(() -> new List().clear());
+        assertDoesNotThrow(() -> testList.clear());
         testList.add(1);
         testList.add("2");
         testList.add(3);
@@ -262,7 +262,7 @@ class ListTest {
 
     @Test
     void clearDoesNotBreakList() {
-        assertDoesNotThrow(() -> new List().clear());
+        assertDoesNotThrow(() -> testList.clear());
         testList.add(1);
         testList.add("2");
         testList.add(3);

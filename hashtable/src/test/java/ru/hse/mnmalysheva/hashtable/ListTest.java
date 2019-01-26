@@ -17,7 +17,7 @@ class ListTest {
 
     @Test
     void addNullThrows() {
-        assertThrows(IllegalArgumentException.class, () -> new List().add(null));
+        assertThrows(Throwable.class, () -> new List().add(null));
     }
 
     @Test

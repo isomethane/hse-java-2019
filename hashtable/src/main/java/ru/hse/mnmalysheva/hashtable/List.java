@@ -5,28 +5,28 @@ public class List {
     /** Singly linked list node. */
     private class Node {
         /** Node content. */
-        private Object data;
+        Object data;
         /** Link to next node. */
-        private Node next = null;
+        Node next = null;
 
-        public Node(Object data) {
+        Node(Object data) {
             this.data = data;
         }
 
-        public Node(Object data, Node next) {
+        Node(Object data, Node next) {
             this.data = data;
             this.next = next;
         }
 
-        public Object getData() {
+        Object getData() {
             return this.data;
         }
 
-        public Node getNext() {
+        Node getNext() {
             return this.next;
         }
 
-        public void setNext(Node next) {
+        void setNext(Node next) {
             this.next = next;
         }
     }

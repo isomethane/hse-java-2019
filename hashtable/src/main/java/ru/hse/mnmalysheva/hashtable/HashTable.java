@@ -4,10 +4,10 @@ package ru.hse.mnmalysheva.hashtable;
 public class HashTable {
     /** Key-value pair */
     private class Pair {
-        public String key;
-        public String value;
+        String key;
+        String value;
 
-        public Pair(String key, String value) {
+        Pair(String key, String value) {
             this.key = key;
             this.value = value;
         }

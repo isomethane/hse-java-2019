@@ -3,132 +3,90 @@ package ru.hse.mnmalysheva.hashtable;
 import java.util.Iterator;
 
 /** Singly linked list. */
-public class List implements Iterable {
+public class List {
     /** Singly linked list node. */
     private class Node {
+        /** Node content. */
         private Object data;
+        /** Link to next node. */
         private Node next = null;
 
         public Node(Object data) {
             this.data = data;
         }
-    }
 
-    /** Singly linked list iterator. */
-    private class ListIterator implements Iterator, ForwardIterator {
-        /** Node located before cursor.
-         * Invariant: must never become null.
-         * If cursor locates before the first element, prevNode points to fictive head.
-         */
-        private Node prevNode;
-
-        public ListIterator(Node prevNode) {
-            this.prevNode = prevNode;
+        public Node(Object data, Node next) {
+            this.data = data;
+            this.next = next;
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public boolean hasNext() {
-            return prevNode.next != null;
+        public Object getData() {
+            return this.data;
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public Object getNext() {
-            return prevNode.next.data;
+        public Node getNext() {
+            return this.next;
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public void goNext() {
-            prevNode = prevNode.next;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Object next() {
-            Object result = getNext();
-            goNext();
-            return result;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void remove() {
-            prevNode.next = prevNode.next.next;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void set(Object data) {
-            prevNode.next.data = data;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void add(Object data) {
-            Node node = new Node(data);
-            node.next = prevNode.next;
-            prevNode.next = node;
-            prevNode = node;
+        public void setNext(Node next) {
+            this.next = next;
         }
     }
 
     /** Fictive head. */
     private Node head = new Node(null);
 
-    /** {@inheritDoc} */
-    public Iterator iterator() {
-        return new ListIterator(head);
-    }
-
-    /** Return list iterator over the elements in list. */
-    public ForwardIterator forwardIterator() {
-        return new ListIterator(head);
-    }
-
-    /** Add element after fictive head. */
+    /** Add element at list beginning. */
     public void add(Object data) {
-        ForwardIterator it = forwardIterator();
-        it.add(data);
-    }
-
-    /** Remove all elements from list. */
-    public void clear() {
-        head.next = null;
-    }
-
-    /** Check if list contains specified object. */
-    public boolean contains(Object o) {
-        for (Object i : this) {
-            if (i.equals(o)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Find the first occurrence of the specified element in list. */
-    public Object find(Object o) {
-        for (Object i : this) {
-            if (i.equals(o)) {
-                return i;
-            }
-        }
-        return null;
+        Node newNode = new Node(data, head.next);
+        head.setNext(newNode);
     }
 
     /** Remove the first occurrence of the specified element in list.
      * @return Removed element.
      */
     public Object remove(Object o) {
-        for (ForwardIterator it = forwardIterator(); it.hasNext(); it.goNext()) {
-            if (it.getNext().equals(o)) {
-                Object removed = it.getNext();
-                it.remove();
-                return removed;
+        for (Node prev = head, cur = prev.next; cur != null; prev = cur, cur = cur.getNext()) {
+            Object data = cur.getData();
+            if (data.equals(o)) {
+                prev.setNext(cur.getNext());
+                return data;
             }
         }
         return null;
+    }
+
+    /** Remove first element.
+     * @return Removed element.
+     */
+    public Object removeFirst() {
+        Node first = head.getNext();
+        if (first != null) {
+            head.setNext(first.getNext());
+        }
+        return first.getData();
+    }
+
+    /** Find the first occurrence of the specified element in list.
+     * @return Link to element if found, false otherwise.
+     */
+    public Object find(Object o) {
+        for (Node cur = head.getNext(); cur != null; cur = cur.getNext()) {
+            Object data = cur.getData();
+            if (data.equals(o)) {
+                return data;
+            }
+        }
+        return null;
+    }
+
+    /** Check if list is empty. */
+    public boolean isEmpty() {
+        return head.getNext() == null;
+    }
+
+    /** Remove all elements from list. */
+    public void clear() {
+        head.setNext(null);
     }
 }

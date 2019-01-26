@@ -67,8 +67,8 @@ public class HashTable {
         List[] oldTable = table;
         initTable(size);
         for (List l : oldTable) {
-            for (Object o : l) {
-                Pair p = (Pair) o;
+            while (!l.isEmpty()) {
+                Pair p = (Pair) l.removeFirst();
                 put(p.key, p.value);
             }
         }
@@ -93,15 +93,11 @@ public class HashTable {
     String put(String key, String value) {
         Pair data = new Pair(key, value);
         List l = table[getHash(key)];
-        for (Object o : l) {
-            Pair p = (Pair) o;
-            if (data.equals(p)) {
-                String prevValue = p.value;
-                p.value = value;
-                return prevValue;
-            }
-        }
+        Pair prev = (Pair) l.remove(key);
         l.add(data);
+        if (prev != null) {
+            return prev.value;
+        }
         numOfKeys++;
         if (numOfKeys >= table.length) {
             resize(table.length * 2);
@@ -123,9 +119,7 @@ public class HashTable {
 
     /** Remove all keys. */
     void clear() {
-        for (List l : table) {
-            l.clear();
-        }
+        initTable(DEFAULT_TABLE_SIZE);
         numOfKeys = 0;
     }
 }

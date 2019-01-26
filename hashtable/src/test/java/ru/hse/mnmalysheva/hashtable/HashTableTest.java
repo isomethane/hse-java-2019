@@ -251,6 +251,12 @@ class HashTableTest {
         assertEquals("4", testTable.put("BBAa", "a"));
     }
 
+    @Test
+    void addKeyWithNegativeHashCodeDoesNotThrow() {
+        assert("StringWithNegativeHashCode239".hashCode() < 0);
+        assertDoesNotThrow(() -> testTable.put("StringWithNegativeHashCode239", "Is it ok?"));
+    }
+
     // remove tests
 
     @Test

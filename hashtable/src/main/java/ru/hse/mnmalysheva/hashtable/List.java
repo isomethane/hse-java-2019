@@ -35,7 +35,7 @@ public class List {
     private Node head = new Node(null);
 
     /** Add element at list beginning. */
-    public void add(Object data) throws IllegalArgumentException {
+    public void add(Object data) {
         if (data == null) {
             throw new IllegalArgumentException("null-s cannot be stored in list.");
         }

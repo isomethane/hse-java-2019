@@ -39,14 +39,14 @@ public class HashTable {
     }
 
     /** Throw exception if key is null. */
-    private void checkKey(String key) throws IllegalArgumentException {
+    private void checkKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null.");
         }
     }
 
     /** Throw exception if value is null. */
-    private void checkValue(String value) throws IllegalArgumentException {
+    private void checkValue(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null.");
         }
@@ -85,14 +85,14 @@ public class HashTable {
     }
 
     /** Check if table contains key. */
-    boolean contains(String key) throws IllegalArgumentException {
+    boolean contains(String key) {
         return get(key) != null;
     }
 
     /** Get value from table.
      * @return value if table contains key, null otherwise.
      */
-    String get(String key) throws IllegalArgumentException {
+    String get(String key) {
         checkKey(key);
 
         var result = (Pair)table[getHash(key)].find(key);
@@ -102,7 +102,7 @@ public class HashTable {
     /** Put key to table.
      * @return removed value if table contained key, null otherwise.
      */
-    String put(String key, String value) throws IllegalArgumentException {
+    String put(String key, String value) {
         checkKey(key);
         checkValue(value);
 
@@ -124,7 +124,7 @@ public class HashTable {
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
-    String remove(String key) throws IllegalArgumentException {
+    String remove(String key) {
         checkKey(key);
 
         var removed = (Pair)table[getHash(key)].remove(key);

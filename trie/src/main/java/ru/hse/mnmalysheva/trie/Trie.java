@@ -10,7 +10,7 @@ import java.io.OutputStream;
  * Allows to add, find and remove strings in O(length).
  */
 public class Trie implements Serializable {
-    /** Add sting to trie.
+    /** Add string to trie.
      * @param element String to add.
      * @return true if trie did not contain this string, false otherwise.
      */

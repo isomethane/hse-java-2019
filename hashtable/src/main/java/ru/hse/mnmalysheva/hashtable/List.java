@@ -35,7 +35,10 @@ public class List {
     private Node head = new Node(null);
 
     /** Add element at list beginning. */
-    public void add(Object data) {
+    public void add(Object data) throws IllegalArgumentException {
+        if (data == null) {
+            throw new IllegalArgumentException("null-s cannot be stored in list.");
+        }
         Node newNode = new Node(data, head.getNext());
         head.setNext(newNode);
     }

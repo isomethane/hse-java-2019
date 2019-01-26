@@ -1,7 +1,5 @@
 package ru.hse.mnmalysheva.hashtable;
 
-import java.util.Iterator;
-
 /** Singly linked list. */
 public class List {
     /** Singly linked list node. */
@@ -38,7 +36,7 @@ public class List {
 
     /** Add element at list beginning. */
     public void add(Object data) {
-        Node newNode = new Node(data, head.next);
+        Node newNode = new Node(data, head.getNext());
         head.setNext(newNode);
     }
 
@@ -46,7 +44,7 @@ public class List {
      * @return Removed element.
      */
     public Object remove(Object o) {
-        for (Node prev = head, cur = prev.next; cur != null; prev = cur, cur = cur.getNext()) {
+        for (Node prev = head, cur = prev.getNext(); cur != null; prev = cur, cur = cur.getNext()) {
             Object data = cur.getData();
             if (data.equals(o)) {
                 prev.setNext(cur.getNext());

@@ -61,8 +61,9 @@ public class List {
         Node first = head.getNext();
         if (first != null) {
             head.setNext(first.getNext());
+            return first.getData();
         }
-        return first.getData();
+        return null;
     }
 
     /** Find the first occurrence of the specified element in list.

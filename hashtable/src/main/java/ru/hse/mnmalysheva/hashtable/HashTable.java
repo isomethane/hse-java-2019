@@ -29,7 +29,7 @@ public class HashTable {
         }
     }
 
-    private final int DEFAULT_TABLE_SIZE = 1000007;
+    private static final int EMPTY_TABLE_SIZE = 1;
     private List[] table;
     private int numOfKeys;
 
@@ -47,23 +47,10 @@ public class HashTable {
         }
     }
 
-    public HashTable() {
-        initTable(DEFAULT_TABLE_SIZE);
-    }
-
-    public HashTable(int size) {
-        initTable(size);
-    }
-
-    /** Number of keys in table. */
-    public int size() {
-        return numOfKeys;
-    }
-
     /** Change array size.
      * @param size New array size.
      */
-    public void resize(int size) {
+    private void resize(int size) {
         List[] oldTable = table;
         initTable(size);
         for (List l : oldTable) {
@@ -72,6 +59,15 @@ public class HashTable {
                 put(p.key, p.value);
             }
         }
+    }
+
+    public HashTable() {
+        initTable(EMPTY_TABLE_SIZE);
+    }
+
+    /** Number of keys in table. */
+    public int size() {
+        return numOfKeys;
     }
 
     /** Check if table contains key. */
@@ -112,6 +108,9 @@ public class HashTable {
         Pair removed = (Pair) table[getHash(key)].remove(key);
         if (removed != null) {
             numOfKeys--;
+            if (numOfKeys * 4 < table.length) {
+                resize(table.length / 2);
+            }
             return removed.value;
         }
         return null;
@@ -119,7 +118,7 @@ public class HashTable {
 
     /** Remove all keys. */
     void clear() {
-        initTable(DEFAULT_TABLE_SIZE);
+        initTable(EMPTY_TABLE_SIZE);
         numOfKeys = 0;
     }
 }

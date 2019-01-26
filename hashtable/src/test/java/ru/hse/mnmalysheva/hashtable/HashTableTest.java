@@ -8,7 +8,7 @@ class HashTableTest {
 
     @Test
     void size() {
-        HashTable t = new HashTable(3);
+        HashTable t = new HashTable();
         assertEquals(0, t.size());
         t.put("1", "a");
         assertEquals(1, t.size());
@@ -28,29 +28,6 @@ class HashTableTest {
         assertEquals(0, t.size());
         t.put("1", "a");
         assertEquals(1, t.size());
-    }
-
-    @Test
-    void resize() {
-        HashTable t = new HashTable(10);
-        for (Integer i = 1; i <= 7; i++) {
-            t.put(i.toString(), "...");
-        }
-        t.resize(3);
-        assertEquals(7, t.size());
-        for (Integer i = 1; i <= 7; i++) {
-            assertTrue(t.contains(i.toString()));
-        }
-        t.resize(100);
-        assertEquals(7, t.size());
-        for (Integer i = 1; i <= 7; i++) {
-            assertTrue(t.contains(i.toString()));
-        }
-        t.resize(1);
-        assertEquals(7, t.size());
-        for (Integer i = 1; i <= 7; i++) {
-            assertTrue(t.contains(i.toString()));
-        }
     }
 
     @Test

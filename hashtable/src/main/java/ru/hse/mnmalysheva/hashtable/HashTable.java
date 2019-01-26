@@ -38,6 +38,13 @@ public class HashTable {
         return Math.abs(key.hashCode() % table.length);
     }
 
+    /** Throw exception if key is null. */
+    private void checkKey(String key) throws IllegalArgumentException {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null.");
+        }
+    }
+
     /** Init array of specified size. */
     private void initTable(int size) {
         numOfKeys = 0;
@@ -71,14 +78,16 @@ public class HashTable {
     }
 
     /** Check if table contains key. */
-    boolean contains(String key) {
+    boolean contains(String key) throws IllegalArgumentException {
         return get(key) != null;
     }
 
     /** Get value from table.
      * @return value if table contains key, null otherwise.
      */
-    String get(String key) {
+    String get(String key) throws IllegalArgumentException {
+        checkKey(key);
+
         var result = (Pair)table[getHash(key)].find(key);
         return result == null ? null : result.value;
     }
@@ -86,10 +95,13 @@ public class HashTable {
     /** Put key to table.
      * @return removed value if table contained key, null otherwise.
      */
-    String put(String key, String value) {
+    String put(String key, String value) throws IllegalArgumentException {
+        checkKey(key);
+
         var data = new Pair(key, value);
         var list = table[getHash(key)];
         var prev = (Pair)list.remove(key);
+
         list.add(data);
         if (prev != null) {
             return prev.value;
@@ -104,7 +116,9 @@ public class HashTable {
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
-    String remove(String key) {
+    String remove(String key) throws IllegalArgumentException {
+        checkKey(key);
+
         var removed = (Pair)table[getHash(key)].remove(key);
         if (removed != null) {
             numOfKeys--;

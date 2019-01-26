@@ -39,14 +39,14 @@ public class HashTable {
     }
 
     /** Throw exception if key is null. */
-    private void checkKey(String key) {
+    private static void checkKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null.");
         }
     }
 
     /** Throw exception if value is null. */
-    private void checkValue(String value) {
+    private static void checkValue(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null.");
         }

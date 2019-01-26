@@ -45,6 +45,13 @@ public class HashTable {
         }
     }
 
+    /** Throw exception if value is null. */
+    private void checkValue(String value) throws IllegalArgumentException {
+        if (value == null) {
+            throw new IllegalArgumentException("Value cannot be null.");
+        }
+    }
+
     /** Init array of specified size. */
     private void initTable(int size) {
         numOfKeys = 0;
@@ -97,6 +104,7 @@ public class HashTable {
      */
     String put(String key, String value) throws IllegalArgumentException {
         checkKey(key);
+        checkValue(value);
 
         var data = new Pair(key, value);
         var list = table[getHash(key)];

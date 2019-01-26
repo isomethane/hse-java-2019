@@ -79,7 +79,7 @@ public class HashTable {
      * @return value if table contains key, null otherwise.
      */
     String get(String key) {
-        Pair result = (Pair)table[getHash(key)].find(key);
+        var result = (Pair)table[getHash(key)].find(key);
         return result == null ? null : result.value;
     }
 
@@ -87,10 +87,10 @@ public class HashTable {
      * @return removed value if table contained key, null otherwise.
      */
     String put(String key, String value) {
-        Pair data = new Pair(key, value);
-        List l = table[getHash(key)];
-        Pair prev = (Pair)l.remove(key);
-        l.add(data);
+        var data = new Pair(key, value);
+        var list = table[getHash(key)];
+        var prev = (Pair)list.remove(key);
+        list.add(data);
         if (prev != null) {
             return prev.value;
         }
@@ -105,7 +105,7 @@ public class HashTable {
      * @return removed value if table contained key, null otherwise.
      */
     String remove(String key) {
-        Pair removed = (Pair)table[getHash(key)].remove(key);
+        var removed = (Pair)table[getHash(key)].remove(key);
         if (removed != null) {
             numOfKeys--;
             if (numOfKeys * 4 < table.length) {

@@ -33,9 +33,9 @@ public class HashTable {
     private List[] table;
     private int numOfKeys;
 
-    /** Sting hash code cropped to size of array. */
+    /** String hash code cropped to size of array. */
     private int getHash(String key) {
-        return key.hashCode() % table.length;
+        return Math.abs(key.hashCode() % table.length);
     }
 
     /** Init array. */

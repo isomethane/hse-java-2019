@@ -39,7 +39,7 @@ public class List {
         if (data == null) {
             throw new IllegalArgumentException("null-s cannot be stored in list.");
         }
-        Node newNode = new Node(data, head.getNext());
+        var newNode = new Node(data, head.getNext());
         head.setNext(newNode);
     }
 
@@ -61,7 +61,7 @@ public class List {
      * @return Removed element.
      */
     public Object removeFirst() {
-        Node first = head.getNext();
+        var first = head.getNext();
         if (first != null) {
             head.setNext(first.getNext());
             return first.getData();
@@ -73,8 +73,8 @@ public class List {
      * @return Link to element if found, false otherwise.
      */
     public Object find(Object o) {
-        for (Node cur = head.getNext(); cur != null; cur = cur.getNext()) {
-            Object data = cur.getData();
+        for (var cur = head.getNext(); cur != null; cur = cur.getNext()) {
+            var data = cur.getData();
             if (data.equals(o)) {
                 return data;
             }

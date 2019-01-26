@@ -19,7 +19,7 @@ public class HashTable {
         @Override
         public boolean equals(Object o) {
             if (o instanceof Pair) {
-                Pair p = (Pair) o;
+                var p = (Pair)o;
                 return key.equals(p.key);
             }
             if (o instanceof String) {
@@ -38,7 +38,7 @@ public class HashTable {
         return Math.abs(key.hashCode() % table.length);
     }
 
-    /** Init array. */
+    /** Init array of specified size. */
     private void initTable(int size) {
         numOfKeys = 0;
         table = new List[size];
@@ -51,11 +51,11 @@ public class HashTable {
      * @param size New array size.
      */
     private void resize(int size) {
-        List[] oldTable = table;
+        var oldTable = table;
         initTable(size);
-        for (List l : oldTable) {
-            while (!l.isEmpty()) {
-                Pair p = (Pair) l.removeFirst();
+        for (var list : oldTable) {
+            while (!list.isEmpty()) {
+                var p = (Pair)list.removeFirst();
                 put(p.key, p.value);
             }
         }
@@ -79,7 +79,7 @@ public class HashTable {
      * @return value if table contains key, null otherwise.
      */
     String get(String key) {
-        Pair result = (Pair) table[getHash(key)].find(key);
+        Pair result = (Pair)table[getHash(key)].find(key);
         return result == null ? null : result.value;
     }
 
@@ -89,7 +89,7 @@ public class HashTable {
     String put(String key, String value) {
         Pair data = new Pair(key, value);
         List l = table[getHash(key)];
-        Pair prev = (Pair) l.remove(key);
+        Pair prev = (Pair)l.remove(key);
         l.add(data);
         if (prev != null) {
             return prev.value;
@@ -105,7 +105,7 @@ public class HashTable {
      * @return removed value if table contained key, null otherwise.
      */
     String remove(String key) {
-        Pair removed = (Pair) table[getHash(key)].remove(key);
+        Pair removed = (Pair)table[getHash(key)].remove(key);
         if (removed != null) {
             numOfKeys--;
             if (numOfKeys * 4 < table.length) {

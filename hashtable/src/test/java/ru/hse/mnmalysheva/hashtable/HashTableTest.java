@@ -8,7 +8,7 @@ class HashTableTest {
 
     @Test
     void size() {
-        HashTable t = new HashTable();
+        var t = new HashTable();
         assertEquals(0, t.size());
         t.put("1", "a");
         assertEquals(1, t.size());
@@ -32,91 +32,91 @@ class HashTableTest {
 
     @Test
     void contains() {
-        HashTable t = new HashTable();
-        for (Integer i = 1; i <= 7; i++) {
-            t.put(i.toString(), "...");
+        var t = new HashTable();
+        for (int i = 1; i <= 7; i++) {
+            t.put(Integer.toString(i), "...");
         }
-        for (Integer i = 5; i <= 15; i++) {
-            t.put(i.toString(), "!!!");
+        for (int i = 5; i <= 15; i++) {
+            t.put(Integer.toString(i), "!!!");
         }
-        for (Integer i = 1; i <= 15; i++) {
-            assertTrue(t.contains(i.toString()));
+        for (int i = 1; i <= 15; i++) {
+            assertTrue(t.contains(Integer.toString(i)));
         }
-        for (Integer i = 1; i <= 10; i++) {
-            t.remove(i.toString());
+        for (int i = 1; i <= 10; i++) {
+            t.remove(Integer.toString(i));
         }
-        for (Integer i = 1; i <= 10; i++) {
-            assertFalse(t.contains(i.toString()));
+        for (int i = 1; i <= 10; i++) {
+            assertFalse(t.contains(Integer.toString(i)));
         }
-        for (Integer i = 11; i <= 15; i++) {
-            assertTrue(t.contains(i.toString()));
+        for (int i = 11; i <= 15; i++) {
+            assertTrue(t.contains(Integer.toString(i)));
         }
     }
 
     @Test
     void get() {
-        HashTable t = new HashTable();
-        for (Integer i = 1; i <= 15; i++) {
-            t.put(i.toString(), "...");
+        var t = new HashTable();
+        for (int i = 1; i <= 15; i++) {
+            t.put(Integer.toString(i), "...");
         }
-        for (Integer i = 5; i <= 10; i++) {
-            t.put(i.toString(), "value" + i.toString());
+        for (int i = 5; i <= 10; i++) {
+            t.put(Integer.toString(i), "value" + i);
         }
         assertNull(t.get("0"));
-        for (Integer i = 1; i < 5; i++) {
-            assertEquals("...", t.get(i.toString()));
+        for (int i = 1; i < 5; i++) {
+            assertEquals("...", t.get(Integer.toString(i)));
         }
-        for (Integer i = 5; i <= 10; i++) {
-            assertEquals("value" + i.toString(), t.get(i.toString()));
+        for (int i = 5; i <= 10; i++) {
+            assertEquals("value" + i, t.get(Integer.toString(i)));
         }
-        for (Integer i = 11; i <= 15; i++) {
-            assertEquals("...", t.get(i.toString()));
+        for (int i = 11; i <= 15; i++) {
+            assertEquals("...", t.get(Integer.toString(i)));
         }
     }
 
     @Test
     void put() {
-        HashTable t = new HashTable();
-        for (Integer i = 1; i <= 15; i++) {
-            assertNull(t.put(i.toString(), "value" + i.toString()));
+        var t = new HashTable();
+        for (int i = 1; i <= 15; i++) {
+            assertNull(t.put(Integer.toString(i), "value" + i));
         }
-        for (Integer i = 5; i <= 10; i++) {
-            assertEquals("value" + i.toString(), t.put(i.toString(), "..."));
+        for (int i = 5; i <= 10; i++) {
+            assertEquals("value" + i, t.put(Integer.toString(i), "..."));
         }
     }
 
     @Test
     void remove() {
-        HashTable t = new HashTable();
-        for (Integer i = 1; i <= 15; i++) {
-            t.put(i.toString(), "value" + i.toString());
+        var t = new HashTable();
+        for (int i = 1; i <= 15; i++) {
+            t.put(Integer.toString(i), "value" + i);
         }
         assertNull(t.remove("0"));
-        for (Integer i = 5; i <= 10; i++) {
-            assertEquals("value" + i.toString(), t.remove(i.toString()));
+        for (int i = 5; i <= 10; i++) {
+            assertEquals("value" + i, t.remove(Integer.toString(i)));
         }
         assertEquals(9, t.size());
-        for (Integer i = 1; i < 5; i++) {
-            assertTrue(t.contains(i.toString()));
+        for (int i = 1; i < 5; i++) {
+            assertTrue(t.contains(Integer.toString(i)));
         }
-        for (Integer i = 5; i <= 10; i++) {
-            assertFalse(t.contains(i.toString()));
+        for (int i = 5; i <= 10; i++) {
+            assertFalse(t.contains(Integer.toString(i)));
         }
-        for (Integer i = 11; i <= 15; i++) {
-            assertTrue(t.contains(i.toString()));
+        for (int i = 11; i <= 15; i++) {
+            assertTrue(t.contains(Integer.toString(i)));
         }
     }
 
     @Test
     void clear() {
-        HashTable t = new HashTable();
-        for (Integer i = 1; i <= 15; i++) {
-            t.put(i.toString(), "value" + i.toString());
+        var t = new HashTable();
+        for (int i = 1; i <= 15; i++) {
+            t.put(Integer.toString(i), "value" + i);
         }
         t.clear();
         assertEquals(0, t.size());
-        for (Integer i = 1; i <= 15; i++) {
-            assertFalse(t.contains(i.toString()));
+        for (int i = 1; i <= 15; i++) {
+            assertFalse(t.contains(Integer.toString(i)));
         }
         t.put("a", "b");
         assertEquals(1, t.size());

@@ -484,7 +484,7 @@ class TrieTest {
         var in = new ByteArrayInputStream(out.toByteArray());
         assertDoesNotThrow(() -> to.deserialize(in));
 
-        for (char c = 0; c < Character.MAX_VALUE; c++) {
+        for (int c = 0; c <= Character.MAX_VALUE; c++) {
             assertTrue(to.contains(Character.toString(c)));
         }
     }

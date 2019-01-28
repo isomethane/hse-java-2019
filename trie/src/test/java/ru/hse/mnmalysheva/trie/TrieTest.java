@@ -3,6 +3,9 @@ package ru.hse.mnmalysheva.trie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrieTest {
@@ -356,10 +359,133 @@ class TrieTest {
     }
 
     @Test
-    void serialize() {
+    void resultOfSerializeDeserializeEqualsSource() {
+        Trie from = new Trie(), to = new Trie();
+        from.add("Test1String");
+        from.add("Test2String");
+        from.add("Test3String");
+        from.add("Test");
+        from.add("test");
+        from.add("String");
+        from.add("Русский");
+        from.add("РусскийТекст");
+        from.add("РусскийТекстПодлиннее");
+
+        to.add("ABC");
+        to.add("def");
+        to.add("123");
+
+        var out = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> from.serialize(out));
+        var in = new ByteArrayInputStream(out.toByteArray());
+        assertDoesNotThrow(() -> to.deserialize(in));
+
+        assertTrue(to.contains("Test1String"));
+        assertTrue(to.contains("Test2String"));
+        assertTrue(to.contains("Test3String"));
+        assertTrue(to.contains("Test"));
+        assertTrue(to.contains("test"));
+        assertTrue(to.contains("String"));
+        assertTrue(to.contains("Русский"));
+        assertTrue(to.contains("РусскийТекст"));
+        assertTrue(to.contains("РусскийТекстПодлиннее"));
+
+        assertFalse(to.contains(""));
+        assertFalse(to.contains("T"));
+        assertFalse(to.contains("Test1"));
+        assertFalse(to.contains("StrinG"));
+        assertFalse(to.contains("String2"));
+
+        assertFalse(to.contains("ABC"));
+        assertFalse(to.contains("def"));
+        assertFalse(to.contains("123"));
     }
 
     @Test
-    void deserialize() {
+    void serializeDeserializeEmptyTrie() {
+        Trie from = new Trie(), to = new Trie();
+        to.add("ABC");
+        to.add("def");
+        to.add("123");
+
+        var out = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> from.serialize(out));
+        var in = new ByteArrayInputStream(out.toByteArray());
+        assertDoesNotThrow(() -> to.deserialize(in));
+
+        assertFalse(to.contains(""));
+        assertFalse(to.contains("T"));
+        assertFalse(to.contains("ABC"));
+        assertFalse(to.contains("def"));
+        assertFalse(to.contains("123"));
+    }
+
+    @Test
+    void canChangeTrieAfterDeserialize() {
+        Trie from = new Trie(), to = new Trie();
+        from.add("Test1String");
+        from.add("Test2String");
+        from.add("Test3String");
+        from.add("Test");
+        from.add("test");
+        from.add("String");
+        from.add("Русский");
+        from.add("РусскийТекст");
+        from.add("РусскийТекстПодлиннее");
+
+        to.add("ABC");
+        to.add("def");
+        to.add("123");
+
+        var out = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> from.serialize(out));
+        var in = new ByteArrayInputStream(out.toByteArray());
+        assertDoesNotThrow(() -> to.deserialize(in));
+
+        to.add("NewString");
+        to.add("НоваяСтрока");
+        to.remove("t");
+        to.remove("Test1String");
+        to.remove("Test");
+        to.remove("РусскийТекст");
+
+        assertTrue(to.contains("NewString"));
+        assertTrue(to.contains("НоваяСтрока"));
+        assertFalse(to.contains("Test1String"));
+        assertTrue(to.contains("Test2String"));
+        assertTrue(to.contains("Test3String"));
+        assertFalse(to.contains("Test"));
+        assertTrue(to.contains("test"));
+        assertTrue(to.contains("String"));
+        assertTrue(to.contains("Русский"));
+        assertFalse(to.contains("РусскийТекст"));
+        assertTrue(to.contains("РусскийТекстПодлиннее"));
+
+        assertFalse(to.contains(""));
+        assertFalse(to.contains("T"));
+        assertFalse(to.contains("Test2"));
+        assertFalse(to.contains("StrinG"));
+        assertFalse(to.contains("String2"));
+
+        assertFalse(to.contains("ABC"));
+        assertFalse(to.contains("def"));
+        assertFalse(to.contains("123"));
+    }
+
+    @Test
+    void serializeAllCharacters() {
+        Trie from = new Trie(), to = new Trie();
+        for (int c = 0; c <= Character.MAX_VALUE; c++) {
+            from.add(Character.toString(c));
+        }
+
+        var out = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> from.serialize(out));
+        var in = new ByteArrayInputStream(out.toByteArray());
+        assertDoesNotThrow(() -> to.deserialize(in));
+
+        for (char c = 0; c < Character.MAX_VALUE; c++) {
+            assertTrue(to.contains(Character.toString(c)));
+        }
     }
 }

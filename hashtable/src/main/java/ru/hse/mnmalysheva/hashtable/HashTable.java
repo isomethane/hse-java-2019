@@ -38,14 +38,14 @@ public class HashTable {
         return Math.abs(key.hashCode() % table.length);
     }
 
-    /** Throw exception if key is null. */
+    /** Throw IllegalArgumentException if key is null. */
     private static void checkKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null.");
         }
     }
 
-    /** Throw exception if value is null. */
+    /** Throw IllegalArgumentException if value is null. */
     private static void checkValue(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Value cannot be null.");

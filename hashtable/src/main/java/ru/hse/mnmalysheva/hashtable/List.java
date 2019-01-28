@@ -48,7 +48,7 @@ public class List {
      */
     public Object remove(Object o) {
         for (Node prev = head, cur = prev.getNext(); cur != null; prev = cur, cur = cur.getNext()) {
-            Object data = cur.getData();
+            var data = cur.getData();
             if (data.equals(o)) {
                 prev.setNext(cur.getNext());
                 return data;

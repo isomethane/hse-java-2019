@@ -9,7 +9,7 @@ import java.util.Hashtable;
  */
 public class Trie implements Serializable {
     /** Trie node class. */
-    private class Node {
+    private class Node implements Serializable {
         /** Flag is true when node represents complete string. */
         boolean isTerminal = false;
         /** Number of terminal nodes in subtree. */
@@ -106,6 +106,51 @@ public class Trie implements Serializable {
             }
             return child.howManyStartWithPrefix(prefix, position + 1);
         }
+
+        /** Write N last bytes (little-endian) of integer to OutputStream.
+         * @param size Number of bytes to write.
+         * @param number Integer to write.
+         */
+        void writeInt(OutputStream out, int size, int number) throws IOException {
+            for (int i = 0; i < size; i++) {
+                out.write(number >> (i * Byte.SIZE));
+            }
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void serialize(OutputStream out) throws IOException {
+            writeInt(out, Character.BYTES + 1, children.size());
+            out.write(isTerminal ? 1 : 0);
+            for (var k : children.keySet()) {
+                writeInt(out, Character.BYTES, k);
+                children.get(k).serialize(out);
+            }
+        }
+
+        /** Read N last bytes (little-endian) of integer from InputStream.
+         * @param size Number of bytes to write.
+         */
+        int readInt(InputStream in, int size) throws IOException {
+            int number = 0;
+            for (int i = 0; i < size; i++) {
+                number += in.read() << (i * Byte.SIZE);
+            }
+            return number;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void deserialize(InputStream in) throws IOException {
+            var n = readInt(in, Character.BYTES + 1);
+            isTerminal = in.read() != 0;
+            for (int i = 0; i < n; i++) {
+                var nextChar = (char) readInt(in, Character.BYTES);
+                var child = new Node();
+                children.put(nextChar, child);
+                child.deserialize(in);
+            }
+        }
     }
 
     /** Tree root represents empty string. */
@@ -155,9 +200,14 @@ public class Trie implements Serializable {
 
     /** {@inheritDoc} */
     @Override
-    public void serialize(OutputStream out) throws IOException {}
+    public void serialize(OutputStream out) throws IOException {
+        root.serialize(out);
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void deserialize(InputStream in) throws IOException {}
+    public void deserialize(InputStream in) throws IOException {
+        root = new Node();
+        root.deserialize(in);
+    }
 }

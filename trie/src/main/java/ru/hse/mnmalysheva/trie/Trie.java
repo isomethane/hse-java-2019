@@ -1,12 +1,9 @@
 package ru.hse.mnmalysheva.trie;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Hashtable;
 
 /**
- * Trie class.
  * Trie is a data structure used to store set of strings.
  * Allows to add, find and remove strings in O(length).
  */
@@ -35,20 +32,20 @@ public class Trie implements Serializable {
 
         /** Add string to trie.
          * @param element String to add.
-         * @param pos Next char position.
+         * @param position Next char position.
          * @return true if trie did not contain this string, false otherwise.
          */
-        boolean add(String element, int pos) {
-            if (pos == element.length()) {
+        boolean add(String element, int position) {
+            if (position == element.length()) {
                 return switchTerminal(true);
             }
-            var nextChar = element.charAt(pos);
+            var nextChar = element.charAt(position);
             var child = children.get(nextChar);
             if (child == null) {
                 child = new Node();
                 children.put(nextChar, child);
             }
-            boolean added = child.add(element, pos + 1);
+            boolean added = child.add(element, position + 1);
             if (added) {
                 size++;
             }
@@ -56,35 +53,35 @@ public class Trie implements Serializable {
         }
 
         /** Check if trie contains specified string.
-         * @param pos Next char position.
+         * @param position Next char position.
          */
-        boolean contains(String element, int pos) {
-            if (pos == element.length()) {
+        boolean contains(String element, int position) {
+            if (position == element.length()) {
                 return isTerminal;
             }
-            var nextChar = element.charAt(pos);
+            var nextChar = element.charAt(position);
             var child = children.get(nextChar);
             if (child == null) {
                 return false;
             }
-            return child.contains(element, pos + 1);
+            return child.contains(element, position + 1);
         }
 
         /** Remove string from trie.
          * @param element String to remove.
-         * @param pos Next char position.
+         * @param position Next char position.
          * @return true if trie contained this string, false otherwise.
          */
-        boolean remove(String element, int pos) {
-            if (pos == element.length()) {
+        boolean remove(String element, int position) {
+            if (position == element.length()) {
                 return switchTerminal(false);
             }
-            var nextChar = element.charAt(pos);
+            var nextChar = element.charAt(position);
             var child = children.get(nextChar);
             if (child == null) {
                 return false;
             }
-            boolean removed = child.remove(element, pos + 1);
+            boolean removed = child.remove(element, position + 1);
             if (removed) {
                 size--;
                 if (child.size == 0) {
@@ -95,25 +92,26 @@ public class Trie implements Serializable {
         }
 
         /** Number of strings starting with specified prefix.
-         * @param pos Next char position.
+         * @param prefix String prefix.
+         * @param position Next char position.
          */
-        int howManyStartWithPrefix(String prefix, int pos) {
-            if (pos == prefix.length()) {
+        int howManyStartWithPrefix(String prefix, int position) {
+            if (position == prefix.length()) {
                 return size;
             }
-            var nextChar = prefix.charAt(pos);
+            var nextChar = prefix.charAt(position);
             var child = children.get(nextChar);
             if (child == null) {
                 return 0;
             }
-            return child.howManyStartWithPrefix(prefix, pos + 1);
+            return child.howManyStartWithPrefix(prefix, position + 1);
         }
     }
 
     /** Tree root represents empty string. */
     private Node root = new Node();
 
-    /** Throw exception if string is null. */
+    /** Throw IllegalArgumentException if string is null. */
     void checkString(String element) {
         if (element == null) {
             throw new IllegalArgumentException("null strings are not allowed");

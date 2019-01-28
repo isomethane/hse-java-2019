@@ -19,7 +19,7 @@ public class HashTable {
         @Override
         public boolean equals(Object o) {
             if (o instanceof Pair) {
-                var p = (Pair)o;
+                var p = (Pair) o;
                 return key.equals(p.key);
             }
             if (o instanceof String) {
@@ -69,7 +69,7 @@ public class HashTable {
         initTable(size);
         for (var list : oldTable) {
             while (!list.isEmpty()) {
-                var p = (Pair)list.removeFirst();
+                var p = (Pair) list.removeFirst();
                 put(p.key, p.value);
             }
         }
@@ -95,7 +95,7 @@ public class HashTable {
     String get(String key) {
         checkKey(key);
 
-        var result = (Pair)table[getHash(key)].find(key);
+        var result = (Pair) table[getHash(key)].find(key);
         return result == null ? null : result.value;
     }
 
@@ -108,7 +108,7 @@ public class HashTable {
 
         var data = new Pair(key, value);
         var list = table[getHash(key)];
-        var prev = (Pair)list.remove(key);
+        var prev = (Pair) list.remove(key);
 
         list.add(data);
         if (prev != null) {
@@ -127,7 +127,7 @@ public class HashTable {
     String remove(String key) {
         checkKey(key);
 
-        var removed = (Pair)table[getHash(key)].remove(key);
+        var removed = (Pair) table[getHash(key)].remove(key);
         if (removed != null) {
             numOfKeys--;
             if (numOfKeys * 4 < table.length) {

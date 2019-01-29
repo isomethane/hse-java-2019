@@ -5,10 +5,22 @@ public class HashTable {
     /** Key-value pair */
     private static class Pair {
         private final String key;
-        private final String value;
+        private String value;
 
         public Pair(String key, String value) {
             this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
             this.value = value;
         }
 
@@ -20,7 +32,7 @@ public class HashTable {
         public boolean equals(Object o) {
             if (o instanceof Pair) {
                 var p = (Pair) o;
-                return key.equals(p.key);
+                return key.equals(p.getKey());
             }
             if (o instanceof String) {
                 return key.equals(o);
@@ -70,7 +82,7 @@ public class HashTable {
         for (var list : oldTable) {
             while (!list.isEmpty()) {
                 var p = (Pair) list.removeFirst();
-                put(p.key, p.value);
+                put(p.getKey(), p.getValue());
             }
         }
     }
@@ -96,7 +108,7 @@ public class HashTable {
         checkKey(key);
 
         var result = (Pair) table[getHash(key)].find(key);
-        return result == null ? null : result.value;
+        return result == null ? null : result.getValue();
     }
 
     /** Put key to table.
@@ -106,14 +118,16 @@ public class HashTable {
         checkKey(key);
         checkValue(value);
 
-        var data = new Pair(key, value);
         var list = table[getHash(key)];
-        var prev = (Pair) list.remove(key);
+        var prev = (Pair) list.find(key);
 
-        list.add(data);
         if (prev != null) {
-            return prev.value;
+            var prevValue = prev.getValue();
+            prev.setValue(value);
+            return prevValue;
         }
+
+        list.add(new Pair(key, value));
         numOfKeys++;
         if (numOfKeys >= table.length) {
             resize(table.length * 2);
@@ -128,14 +142,14 @@ public class HashTable {
         checkKey(key);
 
         var removed = (Pair) table[getHash(key)].remove(key);
-        if (removed != null) {
-            numOfKeys--;
-            if (numOfKeys * 4 < table.length) {
-                resize(table.length / 2);
-            }
-            return removed.value;
+        if (removed == null) {
+            return null;
         }
-        return null;
+        numOfKeys--;
+        if (numOfKeys * 4 < table.length) {
+            resize(Math.max(EMPTY_TABLE_SIZE, table.length / 2));
+        }
+        return removed.getValue();
     }
 
     /** Remove all keys. */

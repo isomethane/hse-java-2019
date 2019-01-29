@@ -9,19 +9,19 @@ import java.util.Hashtable;
  */
 public class Trie implements Serializable {
     /** Trie node class. */
-    private class Node implements Serializable {
+    private static class Node implements Serializable {
         /** Flag is true when node represents complete string. */
-        boolean isTerminal = false;
+        private boolean isTerminal = false;
         /** Number of terminal nodes in subtree. */
-        int size = 0;
+        private int size = 0;
         /** Character-node map of children. */
-        Hashtable<Character, Node> children = new Hashtable<>();
+        private Hashtable<Character, Node> children = new Hashtable<>();
 
         /** Set isTerminal to new state. Recounts subtree size when state changed.
          * @param state New terminal state.
          * @return true if state changed, false otherwise.
          */
-        boolean switchTerminal(boolean state) {
+        private boolean switchTerminal(boolean state) {
             if (isTerminal == state) {
                 return false;
             }
@@ -30,12 +30,33 @@ public class Trie implements Serializable {
             return true;
         }
 
+        /** Write N last bytes (little-endian) of integer to OutputStream.
+         * @param size Number of bytes to write.
+         * @param number Integer to write.
+         */
+        private static void writeInt(OutputStream out, int size, int number) throws IOException {
+            for (int i = 0; i < size; i++) {
+                out.write(number >> (i * Byte.SIZE));
+            }
+        }
+
+        /** Read N last bytes (little-endian) of integer from InputStream.
+         * @param size Number of bytes to write.
+         */
+        private static int readInt(InputStream in, int size) throws IOException {
+            int number = 0;
+            for (int i = 0; i < size; i++) {
+                number += in.read() << (i * Byte.SIZE);
+            }
+            return number;
+        }
+
         /** Add string to trie.
          * @param element String to add.
          * @param position Next char position.
          * @return true if trie did not contain this string, false otherwise.
          */
-        boolean add(String element, int position) {
+        public boolean add(String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(true);
             }
@@ -55,7 +76,7 @@ public class Trie implements Serializable {
         /** Check if trie contains specified string.
          * @param position Next char position.
          */
-        boolean contains(String element, int position) {
+        public boolean contains(String element, int position) {
             if (position == element.length()) {
                 return isTerminal;
             }
@@ -72,7 +93,7 @@ public class Trie implements Serializable {
          * @param position Next char position.
          * @return true if trie contained this string, false otherwise.
          */
-        boolean remove(String element, int position) {
+        public boolean remove(String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(false);
             }
@@ -95,7 +116,7 @@ public class Trie implements Serializable {
          * @param prefix String prefix.
          * @param position Next char position.
          */
-        int howManyStartWithPrefix(String prefix, int position) {
+        public int howManyStartWithPrefix(String prefix, int position) {
             if (position == prefix.length()) {
                 return size;
             }
@@ -107,16 +128,6 @@ public class Trie implements Serializable {
             return child.howManyStartWithPrefix(prefix, position + 1);
         }
 
-        /** Write N last bytes (little-endian) of integer to OutputStream.
-         * @param size Number of bytes to write.
-         * @param number Integer to write.
-         */
-        void writeInt(OutputStream out, int size, int number) throws IOException {
-            for (int i = 0; i < size; i++) {
-                out.write(number >> (i * Byte.SIZE));
-            }
-        }
-
         /** {@inheritDoc} */
         @Override
         public void serialize(OutputStream out) throws IOException {
@@ -126,17 +137,6 @@ public class Trie implements Serializable {
                 writeInt(out, Character.BYTES, k);
                 children.get(k).serialize(out);
             }
-        }
-
-        /** Read N last bytes (little-endian) of integer from InputStream.
-         * @param size Number of bytes to write.
-         */
-        int readInt(InputStream in, int size) throws IOException {
-            int number = 0;
-            for (int i = 0; i < size; i++) {
-                number += in.read() << (i * Byte.SIZE);
-            }
-            return number;
         }
 
         /** {@inheritDoc} */
@@ -157,7 +157,7 @@ public class Trie implements Serializable {
     private Node root = new Node();
 
     /** Throw IllegalArgumentException if string is null. */
-    void checkString(String element) {
+    private static void checkString(String element) {
         if (element == null) {
             throw new IllegalArgumentException("null strings are not allowed");
         }

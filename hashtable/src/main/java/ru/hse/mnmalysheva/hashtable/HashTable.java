@@ -3,11 +3,11 @@ package ru.hse.mnmalysheva.hashtable;
 /** Chained hash table with string keys and values */
 public class HashTable {
     /** Key-value pair */
-    private class Pair {
-        String key;
-        String value;
+    private static class Pair {
+        private final String key;
+        private final String value;
 
-        Pair(String key, String value) {
+        public Pair(String key, String value) {
             this.key = key;
             this.value = value;
         }

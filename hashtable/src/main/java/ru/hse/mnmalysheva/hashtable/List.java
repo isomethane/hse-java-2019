@@ -3,30 +3,30 @@ package ru.hse.mnmalysheva.hashtable;
 /** Singly linked list. */
 public class List {
     /** Singly linked list node. */
-    private class Node {
+    private static class Node {
         /** Node content. */
-        Object data;
+        private Object data;
         /** Link to next node. */
-        Node next = null;
+        private Node next = null;
 
-        Node(Object data) {
+        public Node(Object data) {
             this.data = data;
         }
 
-        Node(Object data, Node next) {
+        public Node(Object data, Node next) {
             this.data = data;
             this.next = next;
         }
 
-        Object getData() {
+        public Object getData() {
             return this.data;
         }
 
-        Node getNext() {
+        public Node getNext() {
             return this.next;
         }
 
-        void setNext(Node next) {
+        public void setNext(Node next) {
             this.next = next;
         }
     }

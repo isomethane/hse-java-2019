@@ -7,7 +7,7 @@ public class List {
         /** Node content. */
         private Object data;
         /** Link to next node. */
-        private Node next = null;
+        private Node next;
 
         public Node(Object data) {
             this.data = data;

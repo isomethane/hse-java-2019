@@ -7,20 +7,8 @@ public class HashTable {
         private final String key;
         private String value;
 
-        public Pair(String key, String value) {
+        private Pair(String key, String value) {
             this.key = key;
-            this.value = value;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
             this.value = value;
         }
 
@@ -32,7 +20,7 @@ public class HashTable {
         public boolean equals(Object o) {
             if (o instanceof Pair) {
                 var p = (Pair) o;
-                return key.equals(p.getKey());
+                return key.equals(p.key);
             }
             if (o instanceof String) {
                 return key.equals(o);
@@ -82,7 +70,7 @@ public class HashTable {
         for (var list : oldTable) {
             while (!list.isEmpty()) {
                 var p = (Pair) list.removeFirst();
-                put(p.getKey(), p.getValue());
+                put(p.key, p.value);
             }
         }
     }
@@ -97,24 +85,24 @@ public class HashTable {
     }
 
     /** Check if table contains key. */
-    boolean contains(String key) {
+    public boolean contains(String key) {
         return get(key) != null;
     }
 
     /** Get value from table.
      * @return value if table contains key, null otherwise.
      */
-    String get(String key) {
+    public String get(String key) {
         checkKey(key);
 
         var result = (Pair) table[getHash(key)].find(key);
-        return result == null ? null : result.getValue();
+        return result == null ? null : result.value;
     }
 
     /** Put key to table.
      * @return removed value if table contained key, null otherwise.
      */
-    String put(String key, String value) {
+    public String put(String key, String value) {
         checkKey(key);
         checkValue(value);
 
@@ -122,8 +110,8 @@ public class HashTable {
         var prev = (Pair) list.find(key);
 
         if (prev != null) {
-            var prevValue = prev.getValue();
-            prev.setValue(value);
+            var prevValue = prev.value;
+            prev.value = value;
             return prevValue;
         }
 
@@ -138,7 +126,7 @@ public class HashTable {
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
-    String remove(String key) {
+    public String remove(String key) {
         checkKey(key);
 
         var removed = (Pair) table[getHash(key)].remove(key);
@@ -149,12 +137,11 @@ public class HashTable {
         if (numOfKeys * 4 < table.length) {
             resize(Math.max(EMPTY_TABLE_SIZE, table.length / 2));
         }
-        return removed.getValue();
+        return removed.value;
     }
 
     /** Remove all keys. */
-    void clear() {
+    public void clear() {
         initTable(EMPTY_TABLE_SIZE);
-        numOfKeys = 0;
     }
 }

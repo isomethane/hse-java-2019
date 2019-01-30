@@ -9,24 +9,12 @@ public class List {
         /** Link to next node. */
         private Node next;
 
-        public Node(Object data) {
+        private Node(Object data) {
             this.data = data;
         }
 
-        public Node(Object data, Node next) {
+        private Node(Object data, Node next) {
             this.data = data;
-            this.next = next;
-        }
-
-        public Object getData() {
-            return this.data;
-        }
-
-        public Node getNext() {
-            return this.next;
-        }
-
-        public void setNext(Node next) {
             this.next = next;
         }
     }
@@ -39,18 +27,18 @@ public class List {
         if (data == null) {
             throw new IllegalArgumentException("null-s cannot be stored in list.");
         }
-        var newNode = new Node(data, head.getNext());
-        head.setNext(newNode);
+        var newNode = new Node(data, head.next);
+        head.next = newNode;
     }
 
     /** Remove the first occurrence of the specified element in list.
      * @return Removed element.
      */
     public Object remove(Object o) {
-        for (Node prev = head, cur = prev.getNext(); cur != null; prev = cur, cur = cur.getNext()) {
-            var data = cur.getData();
+        for (Node prev = head, cur = prev.next; cur != null; prev = cur, cur = cur.next) {
+            var data = cur.data;
             if (data.equals(o)) {
-                prev.setNext(cur.getNext());
+                prev.next = cur.next;
                 return data;
             }
         }
@@ -61,10 +49,10 @@ public class List {
      * @return Removed element.
      */
     public Object removeFirst() {
-        var first = head.getNext();
+        var first = head.next;
         if (first != null) {
-            head.setNext(first.getNext());
-            return first.getData();
+            head.next = first.next;
+            return first.data;
         }
         return null;
     }
@@ -73,8 +61,8 @@ public class List {
      * @return Link to element if found, false otherwise.
      */
     public Object find(Object o) {
-        for (var cur = head.getNext(); cur != null; cur = cur.getNext()) {
-            var data = cur.getData();
+        for (var cur = head.next; cur != null; cur = cur.next) {
+            var data = cur.data;
             if (data.equals(o)) {
                 return data;
             }
@@ -84,11 +72,11 @@ public class List {
 
     /** Check if list is empty. */
     public boolean isEmpty() {
-        return head.getNext() == null;
+        return head.next == null;
     }
 
     /** Remove all elements from list. */
     public void clear() {
-        head.setNext(null);
+        head.next = null;
     }
 }

@@ -1,5 +1,7 @@
 package ru.hse.mnmalysheva.hashtable;
 
+import org.jetbrains.annotations.NotNull;
+
 /** Chained hash table with string keys and values */
 public class HashTable {
     /** Key-value pair */
@@ -7,7 +9,7 @@ public class HashTable {
         private final String key;
         private String value;
 
-        private Pair(String key, String value) {
+        private Pair(@NotNull String key, @NotNull String value) {
             this.key = key;
             this.value = value;
         }
@@ -34,22 +36,8 @@ public class HashTable {
     private int numOfKeys;
 
     /** String hash code cropped to size of array. */
-    private int getHash(String key) {
+    private int getHash(@NotNull String key) {
         return Math.abs(key.hashCode() % table.length);
-    }
-
-    /** Throw IllegalArgumentException if key is null. */
-    private static void checkKey(String key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Key cannot be null.");
-        }
-    }
-
-    /** Throw IllegalArgumentException if value is null. */
-    private static void checkValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Value cannot be null.");
-        }
     }
 
     /** Init array of specified size. */
@@ -85,16 +73,14 @@ public class HashTable {
     }
 
     /** Check if table contains key. */
-    public boolean contains(String key) {
+    public boolean contains(@NotNull String key) {
         return get(key) != null;
     }
 
     /** Get value from table.
      * @return value if table contains key, null otherwise.
      */
-    public String get(String key) {
-        checkKey(key);
-
+    public String get(@NotNull String key) {
         var result = (Pair) table[getHash(key)].find(key);
         return result == null ? null : result.value;
     }
@@ -102,10 +88,7 @@ public class HashTable {
     /** Put key to table.
      * @return removed value if table contained key, null otherwise.
      */
-    public String put(String key, String value) {
-        checkKey(key);
-        checkValue(value);
-
+    public String put(@NotNull String key, @NotNull String value) {
         var list = table[getHash(key)];
         var prev = (Pair) list.find(key);
 
@@ -126,9 +109,7 @@ public class HashTable {
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
-    public String remove(String key) {
-        checkKey(key);
-
+    public String remove(@NotNull String key) {
         var removed = (Pair) table[getHash(key)].remove(key);
         if (removed == null) {
             return null;

@@ -144,12 +144,6 @@ class HashTableTest {
     // get tests
 
     @Test
-    void getNullThrows() {
-        testTable.put("1", "a");
-        assertThrows(IllegalArgumentException.class, () -> testTable.get(null));
-    }
-
-    @Test
     void getReturnsLastAdded() {
         testTable.put("1", "a4");
         testTable.put("2", "b4");
@@ -205,15 +199,6 @@ class HashTableTest {
     // put tests
 
     @Test
-    void putNullThrows() {
-        testTable.put("1", "a");
-        assertThrows(IllegalArgumentException.class, () -> testTable.put(null, "123"));
-        init();
-        testTable.put("1", "a");
-        assertThrows(IllegalArgumentException.class, () -> testTable.put("123", null));
-    }
-
-    @Test
     void putReturnsRightValue() {
         assertNull(testTable.put("1", "a4"));
         assertNull(testTable.put("2", "b4"));
@@ -258,12 +243,6 @@ class HashTableTest {
     }
 
     // remove tests
-
-    @Test
-    void removeNullThrows() {
-        testTable.put("1", "a");
-        assertThrows(IllegalArgumentException.class, () -> testTable.remove(null));
-    }
 
     @Test
     void removeReturnsLastAdded() {

@@ -1,5 +1,8 @@
 package ru.hse.mnmalysheva.hashtable;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /** Singly linked list. */
 public class List {
     /** Singly linked list node. */
@@ -23,18 +26,14 @@ public class List {
     private Node head = new Node(null);
 
     /** Add element at list beginning. */
-    public void add(Object data) {
-        if (data == null) {
-            throw new IllegalArgumentException("null-s cannot be stored in list.");
-        }
-        var newNode = new Node(data, head.next);
-        head.next = newNode;
+    public void add(@NotNull Object data) {
+        head.next = new Node(data, head.next);
     }
 
     /** Remove the first occurrence of the specified element in list.
-     * @return Removed element.
+     * @return Null if no element was found, removed element otherwise.
      */
-    public Object remove(Object o) {
+    public @Nullable Object remove(@NotNull Object o) {
         for (Node prev = head, cur = prev.next; cur != null; prev = cur, cur = cur.next) {
             var data = cur.data;
             if (data.equals(o)) {
@@ -50,17 +49,17 @@ public class List {
      */
     public Object removeFirst() {
         var first = head.next;
-        if (first != null) {
-            head.next = first.next;
-            return first.data;
+        if (first == null) {
+            throw new IllegalStateException("Trying to remove first element of empty list.");
         }
-        return null;
+        head.next = first.next;
+        return first.data;
     }
 
     /** Find the first occurrence of the specified element in list.
-     * @return Link to element if found, false otherwise.
+     * @return Null if no element was found, founded element otherwise.
      */
-    public Object find(Object o) {
+    public @Nullable Object find(@NotNull Object o) {
         for (var cur = head.next; cur != null; cur = cur.next) {
             var data = cur.data;
             if (data.equals(o)) {

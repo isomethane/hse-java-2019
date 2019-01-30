@@ -16,11 +16,6 @@ class ListTest {
     // add tests
 
     @Test
-    void addNullThrows() {
-        assertThrows(IllegalArgumentException.class, () -> testList.add(null));
-    }
-
-    @Test
     void containsAddedElements() {
         testList.add(1);
         assertEquals(1, testList.find(1));
@@ -71,7 +66,7 @@ class ListTest {
         testList.add("2");
         testList.add(3);
         testList.add("4");
-        assertEquals(null, testList.remove(0));
+        assertNull(testList.remove(0));
         assertEquals("4", testList.remove("4"));
         assertEquals(1, testList.remove(1));
         assertEquals(3, testList.remove(3));
@@ -86,8 +81,8 @@ class ListTest {
         testList.add("4");
         assertEquals(3, testList.remove(3));
         assertEquals("2", testList.remove("2"));
-        assertEquals(null, testList.find("2"));
-        assertEquals(null, testList.find(3));
+        assertNull(testList.find("2"));
+        assertNull(testList.find(3));
     }
 
     @Test
@@ -117,19 +112,9 @@ class ListTest {
         assertEquals(3, testList.removeFirst());
         assertEquals("2", testList.removeFirst());
         assertEquals(1, testList.removeFirst());
-        assertNull(testList.removeFirst());
     }
 
     // find tests
-
-    @Test
-    void nullIsNotFound() {
-        testList.add(1);
-        testList.add("2");
-        testList.add(3);
-        testList.add("4");
-        assertNull(testList.find(null));
-    }
 
     @Test
     void findDoesNotBreakList() {
@@ -151,7 +136,6 @@ class ListTest {
         assertEquals(3, testList.removeFirst());
         assertEquals("2", testList.removeFirst());
         assertEquals(1, testList.removeFirst());
-        assertNull(testList.removeFirst());
     }
 
     @Test

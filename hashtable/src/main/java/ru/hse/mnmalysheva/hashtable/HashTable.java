@@ -9,6 +9,10 @@ public class HashTable {
         private final String key;
         private String value;
 
+        private Pair(@NotNull String key) {
+            this.key = key;
+        }
+
         private Pair(@NotNull String key, @NotNull String value) {
             this.key = key;
             this.value = value;
@@ -23,9 +27,6 @@ public class HashTable {
             if (o instanceof Pair) {
                 var p = (Pair) o;
                 return key.equals(p.key);
-            }
-            if (o instanceof String) {
-                return key.equals(o);
             }
             return false;
         }
@@ -81,7 +82,7 @@ public class HashTable {
      * @return value if table contains key, null otherwise.
      */
     public String get(@NotNull String key) {
-        var result = (Pair) table[getHash(key)].find(key);
+        var result = (Pair) table[getHash(key)].find(new Pair(key));
         return result == null ? null : result.value;
     }
 
@@ -90,7 +91,8 @@ public class HashTable {
      */
     public String put(@NotNull String key, @NotNull String value) {
         var list = table[getHash(key)];
-        var prev = (Pair) list.find(key);
+        var data = new Pair(key, value);
+        var prev = (Pair) list.find(data);
 
         if (prev != null) {
             var prevValue = prev.value;
@@ -98,7 +100,7 @@ public class HashTable {
             return prevValue;
         }
 
-        list.add(new Pair(key, value));
+        list.add(data);
         numOfKeys++;
         if (numOfKeys >= table.length) {
             resize(table.length * 2);
@@ -110,7 +112,7 @@ public class HashTable {
      * @return removed value if table contained key, null otherwise.
      */
     public String remove(@NotNull String key) {
-        var removed = (Pair) table[getHash(key)].remove(key);
+        var removed = (Pair) table[getHash(key)].remove(new Pair(key));
         if (removed == null) {
             return null;
         }

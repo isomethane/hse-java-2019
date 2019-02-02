@@ -19,11 +19,6 @@ class TrieTest {
     // add tests
 
     @Test
-    void addNullThrows() {
-        assertThrows(IllegalArgumentException.class, () -> testTrie.add(null));
-    }
-
-    @Test
     void addNewStringReturnsTrue() {
         assertTrue(testTrie.add("Test1String"));
         assertTrue(testTrie.add("Test2String"));
@@ -57,11 +52,6 @@ class TrieTest {
     }
 
     // contains tests
-
-    @Test
-    void containsNullThrows() {
-        assertThrows(IllegalArgumentException.class, () -> testTrie.contains(null));
-    }
 
     @Test
     void doesNotContainNotAdded() {
@@ -126,11 +116,6 @@ class TrieTest {
     }
 
     // remove tests
-
-    @Test
-    void removeNullThrows() {
-        assertThrows(IllegalArgumentException.class, () -> testTrie.remove(null));
-    }
 
     @Test
     void removeNewStringReturnsFalse() {

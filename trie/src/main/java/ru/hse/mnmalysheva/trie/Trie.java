@@ -1,5 +1,7 @@
 package ru.hse.mnmalysheva.trie;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.util.Hashtable;
 
@@ -15,7 +17,7 @@ public class Trie implements Serializable {
         /** Number of terminal nodes in subtree. */
         private int size = 0;
         /** Character-node map of children. */
-        private Hashtable<Character, Node> children = new Hashtable<>();
+        private final Hashtable<Character, Node> children = new Hashtable<>();
 
         /** Set isTerminal to new state. Recounts subtree size when state changed.
          * @param state New terminal state.
@@ -34,7 +36,7 @@ public class Trie implements Serializable {
          * @param size Number of bytes to write.
          * @param number Integer to write.
          */
-        private static void writeInt(OutputStream out, int size, int number) throws IOException {
+        private static void writeInt(@NotNull OutputStream out, int size, int number) throws IOException {
             for (int i = 0; i < size; i++) {
                 out.write(number >> (i * Byte.SIZE));
             }
@@ -43,7 +45,7 @@ public class Trie implements Serializable {
         /** Read N last bytes (little-endian) of integer from InputStream.
          * @param size Number of bytes to write.
          */
-        private static int readInt(InputStream in, int size) throws IOException {
+        private static int readInt(@NotNull InputStream in, int size) throws IOException {
             int number = 0;
             for (int i = 0; i < size; i++) {
                 number += in.read() << (i * Byte.SIZE);
@@ -56,7 +58,7 @@ public class Trie implements Serializable {
          * @param position Next char position.
          * @return true if trie did not contain this string, false otherwise.
          */
-        public boolean add(String element, int position) {
+        private boolean add(@NotNull String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(true);
             }
@@ -76,7 +78,7 @@ public class Trie implements Serializable {
         /** Check if trie contains specified string.
          * @param position Next char position.
          */
-        public boolean contains(String element, int position) {
+        private boolean contains(@NotNull String element, int position) {
             if (position == element.length()) {
                 return isTerminal;
             }
@@ -93,7 +95,7 @@ public class Trie implements Serializable {
          * @param position Next char position.
          * @return true if trie contained this string, false otherwise.
          */
-        public boolean remove(String element, int position) {
+        private boolean remove(@NotNull String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(false);
             }
@@ -116,7 +118,7 @@ public class Trie implements Serializable {
          * @param prefix String prefix.
          * @param position Next char position.
          */
-        public int howManyStartWithPrefix(String prefix, int position) {
+        private int howManyStartWithPrefix(@NotNull String prefix, int position) {
             if (position == prefix.length()) {
                 return size;
             }
@@ -130,7 +132,7 @@ public class Trie implements Serializable {
 
         /** {@inheritDoc} */
         @Override
-        public void serialize(OutputStream out) throws IOException {
+        public void serialize(@NotNull OutputStream out) throws IOException {
             writeInt(out, Character.BYTES + 1, children.size());
             out.write(isTerminal ? 1 : 0);
             for (var k : children.keySet()) {
@@ -141,7 +143,7 @@ public class Trie implements Serializable {
 
         /** {@inheritDoc} */
         @Override
-        public void deserialize(InputStream in) throws IOException {
+        public void deserialize(@NotNull InputStream in) throws IOException {
             var n = readInt(in, Character.BYTES + 1);
             isTerminal = in.read() != 0;
             for (int i = 0; i < n; i++) {
@@ -156,25 +158,16 @@ public class Trie implements Serializable {
     /** Tree root represents empty string. */
     private Node root = new Node();
 
-    /** Throw IllegalArgumentException if string is null. */
-    private static void checkString(String element) {
-        if (element == null) {
-            throw new IllegalArgumentException("null strings are not allowed");
-        }
-    }
-
     /** Add string to trie.
      * @param element String to add.
      * @return true if trie did not contain this string, false otherwise.
      */
-    public boolean add(String element) {
-        checkString(element);
+    public boolean add(@NotNull String element) {
         return root.add(element, 0);
     }
 
     /** Check if trie contains specified string. */
-    public boolean contains(String element) {
-        checkString(element);
+    public boolean contains(@NotNull String element) {
         return root.contains(element, 0);
     }
 
@@ -182,8 +175,7 @@ public class Trie implements Serializable {
      * @param element String to remove.
      * @return true if trie contained this string, false otherwise.
      */
-    public boolean remove(String element) {
-        checkString(element);
+    public boolean remove(@NotNull String element) {
         return root.remove(element, 0);
     }
 
@@ -193,20 +185,19 @@ public class Trie implements Serializable {
     }
 
     /** Number of strings starting with specified prefix. */
-    public int howManyStartWithPrefix(String prefix) {
-        checkString(prefix);
+    public int howManyStartWithPrefix(@NotNull String prefix) {
         return root.howManyStartWithPrefix(prefix, 0);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void serialize(OutputStream out) throws IOException {
+    public void serialize(@NotNull OutputStream out) throws IOException {
         root.serialize(out);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void deserialize(InputStream in) throws IOException {
+    public void deserialize(@NotNull InputStream in) throws IOException {
         root = new Node();
         root.deserialize(in);
     }

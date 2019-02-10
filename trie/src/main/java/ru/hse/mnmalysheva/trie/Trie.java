@@ -15,6 +15,32 @@ public class Trie implements Serializable {
         private int size = 0;
         private final Hashtable<Character, Node> children = new Hashtable<>();
 
+        @Override
+        public int hashCode() {
+            int hash = isTerminal ? 1 : 0;
+            for (var k : children.keySet()) {
+                hash += k * children.get(k).hashCode();
+            }
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Node) {
+                var node = (Node) o;
+                if (isTerminal != node.isTerminal || size != node.size || !children.equals(node.children)) {
+                    return false;
+                }
+                for (var k : children.keySet()) {
+                    if (!children.get(k).equals(node.children.get(k))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
         private boolean switchTerminal(boolean state) {
             if (isTerminal == state) {
                 return false;
@@ -106,6 +132,22 @@ public class Trie implements Serializable {
     }
 
     private Node root = new Node();
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return root.hashCode();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Trie) {
+            var trie = (Trie) o;
+            return root.equals(trie.root);
+        }
+        return false;
+    }
 
     /** Add string to trie.
      * @param element String to add.

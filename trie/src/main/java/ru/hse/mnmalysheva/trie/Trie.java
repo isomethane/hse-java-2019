@@ -31,11 +31,6 @@ public class Trie implements Serializable {
                 if (isTerminal != node.isTerminal || size != node.size || !children.equals(node.children)) {
                     return false;
                 }
-                for (var k : children.keySet()) {
-                    if (!children.get(k).equals(node.children.get(k))) {
-                        return false;
-                    }
-                }
                 return true;
             }
             return false;

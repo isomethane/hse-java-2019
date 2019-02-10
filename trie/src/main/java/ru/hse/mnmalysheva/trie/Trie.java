@@ -11,7 +11,7 @@ import java.util.Hashtable;
  */
 public class Trie implements Serializable {
     /** Trie node class. */
-    private static class Node implements Serializable {
+    private static class Node {
         /** Flag is true when node represents complete string. */
         private boolean isTerminal = false;
         /** Number of terminal nodes in subtree. */
@@ -30,27 +30,6 @@ public class Trie implements Serializable {
             isTerminal = state;
             size += isTerminal ? 1 : -1;
             return true;
-        }
-
-        /** Write N last bytes (little-endian) of integer to OutputStream.
-         * @param size Number of bytes to write.
-         * @param number Integer to write.
-         */
-        private static void writeInt(@NotNull OutputStream out, int size, int number) throws IOException {
-            for (int i = 0; i < size; i++) {
-                out.write(number >> (i * Byte.SIZE));
-            }
-        }
-
-        /** Read N last bytes (little-endian) of integer from InputStream.
-         * @param size Number of bytes to write.
-         */
-        private static int readInt(@NotNull InputStream in, int size) throws IOException {
-            int number = 0;
-            for (int i = 0; i < size; i++) {
-                number += in.read() << (i * Byte.SIZE);
-            }
-            return number;
         }
 
         /** Add string to trie.
@@ -130,24 +109,22 @@ public class Trie implements Serializable {
             return child.howManyStartWithPrefix(prefix, position + 1);
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public void serialize(@NotNull OutputStream out) throws IOException {
-            writeInt(out, Character.BYTES + 1, children.size());
-            out.write(isTerminal ? 1 : 0);
+        /** Convert node into byte sequence. */
+        public void serialize(@NotNull DataOutputStream out) throws IOException {
+            out.writeInt(children.size());
+            out.writeBoolean(isTerminal);
             for (var k : children.keySet()) {
-                writeInt(out, Character.BYTES, k);
+                out.writeChar(k);
                 children.get(k).serialize(out);
             }
         }
 
-        /** {@inheritDoc} */
-        @Override
-        public void deserialize(@NotNull InputStream in) throws IOException {
-            var n = readInt(in, Character.BYTES + 1);
-            isTerminal = in.read() != 0;
+        /** Read node from byte sequence. */
+        public void deserialize(@NotNull DataInputStream in) throws IOException {
+            var n = in.readInt();
+            isTerminal = in.readBoolean();
             for (int i = 0; i < n; i++) {
-                var nextChar = (char) readInt(in, Character.BYTES);
+                var nextChar = in.readChar();
                 var child = new Node();
                 children.put(nextChar, child);
                 child.deserialize(in);
@@ -192,13 +169,13 @@ public class Trie implements Serializable {
     /** {@inheritDoc} */
     @Override
     public void serialize(@NotNull OutputStream out) throws IOException {
-        root.serialize(out);
+        root.serialize(new DataOutputStream(out));
     }
 
     /** {@inheritDoc} */
     @Override
     public void deserialize(@NotNull InputStream in) throws IOException {
         root = new Node();
-        root.deserialize(in);
+        root.deserialize(new DataInputStream(in));
     }
 }

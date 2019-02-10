@@ -122,11 +122,13 @@ public class Trie implements Serializable {
         private void deserialize(@NotNull DataInputStream in) throws IOException {
             var n = in.readInt();
             isTerminal = in.readBoolean();
+            size = isTerminal ? 1 : 0;
             for (int i = 0; i < n; i++) {
                 var nextChar = in.readChar();
                 var child = new Node();
                 children.put(nextChar, child);
                 child.deserialize(in);
+                size += child.size;
             }
         }
     }

@@ -10,19 +10,11 @@ import java.util.Hashtable;
  * Allows to add, find and remove strings in O(length).
  */
 public class Trie implements Serializable {
-    /** Trie node class. */
     private static class Node {
-        /** Flag is true when node represents complete string. */
         private boolean isTerminal = false;
-        /** Number of terminal nodes in subtree. */
         private int size = 0;
-        /** Character-node map of children. */
         private final Hashtable<Character, Node> children = new Hashtable<>();
 
-        /** Set isTerminal to new state. Recounts subtree size when state changed.
-         * @param state New terminal state.
-         * @return true if state changed, false otherwise.
-         */
         private boolean switchTerminal(boolean state) {
             if (isTerminal == state) {
                 return false;
@@ -32,11 +24,6 @@ public class Trie implements Serializable {
             return true;
         }
 
-        /** Add string to trie.
-         * @param element String to add.
-         * @param position Next char position.
-         * @return true if trie did not contain this string, false otherwise.
-         */
         private boolean add(@NotNull String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(true);
@@ -54,9 +41,6 @@ public class Trie implements Serializable {
             return added;
         }
 
-        /** Check if trie contains specified string.
-         * @param position Next char position.
-         */
         private boolean contains(@NotNull String element, int position) {
             if (position == element.length()) {
                 return isTerminal;
@@ -69,11 +53,6 @@ public class Trie implements Serializable {
             return child.contains(element, position + 1);
         }
 
-        /** Remove string from trie.
-         * @param element String to remove.
-         * @param position Next char position.
-         * @return true if trie contained this string, false otherwise.
-         */
         private boolean remove(@NotNull String element, int position) {
             if (position == element.length()) {
                 return switchTerminal(false);
@@ -93,10 +72,6 @@ public class Trie implements Serializable {
             return removed;
         }
 
-        /** Number of strings starting with specified prefix.
-         * @param prefix String prefix.
-         * @param position Next char position.
-         */
         private int howManyStartWithPrefix(@NotNull String prefix, int position) {
             if (position == prefix.length()) {
                 return size;
@@ -109,8 +84,7 @@ public class Trie implements Serializable {
             return child.howManyStartWithPrefix(prefix, position + 1);
         }
 
-        /** Convert node into byte sequence. */
-        public void serialize(@NotNull DataOutputStream out) throws IOException {
+        private void serialize(@NotNull DataOutputStream out) throws IOException {
             out.writeInt(children.size());
             out.writeBoolean(isTerminal);
             for (var k : children.keySet()) {
@@ -119,8 +93,7 @@ public class Trie implements Serializable {
             }
         }
 
-        /** Read node from byte sequence. */
-        public void deserialize(@NotNull DataInputStream in) throws IOException {
+        private void deserialize(@NotNull DataInputStream in) throws IOException {
             var n = in.readInt();
             isTerminal = in.readBoolean();
             for (int i = 0; i < n; i++) {
@@ -132,7 +105,6 @@ public class Trie implements Serializable {
         }
     }
 
-    /** Tree root represents empty string. */
     private Node root = new Node();
 
     /** Add string to trie.

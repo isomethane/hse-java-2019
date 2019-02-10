@@ -18,8 +18,8 @@ public class Trie implements Serializable {
         @Override
         public int hashCode() {
             int hash = isTerminal ? 1 : 0;
-            for (var k : children.keySet()) {
-                hash += k * children.get(k).hashCode();
+            for (var e : children.entrySet()) {
+                hash += e.getKey() * e.getValue().hashCode();
             }
             return hash;
         }
@@ -28,10 +28,7 @@ public class Trie implements Serializable {
         public boolean equals(Object o) {
             if (o instanceof Node) {
                 var node = (Node) o;
-                if (isTerminal != node.isTerminal || size != node.size || !children.equals(node.children)) {
-                    return false;
-                }
-                return true;
+                return isTerminal == node.isTerminal && size == node.size && children.equals(node.children);
             }
             return false;
         }
@@ -108,9 +105,9 @@ public class Trie implements Serializable {
         private void serialize(@NotNull DataOutputStream out) throws IOException {
             out.writeInt(children.size());
             out.writeBoolean(isTerminal);
-            for (var k : children.keySet()) {
-                out.writeChar(k);
-                children.get(k).serialize(out);
+            for (var e : children.entrySet()) {
+                out.writeChar(e.getKey());
+                e.getValue().serialize(out);
             }
         }
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -343,9 +344,371 @@ class TrieTest {
         assertEquals(1, testTrie.howManyStartWithPrefix("РусскийТекстПодлиннее"));
     }
 
+    // equals tests
+
+    @Test
+    void emptyTriesAreEqual() {
+        var first = new Trie();
+        var second = new Trie();
+        assertEquals(first, second);
+    }
+
+    @Test
+    void emptyTrieIsNotEqualToTrieWithEmptyString() {
+        var first = new Trie();
+        var second = new Trie();
+        first.add("");
+        assertNotEquals(first, second);
+    }
+
+    @Test
+    void equalsSimpleTest() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("ab");
+        second.add("ac");
+
+        assertNotEquals(first, second);
+    }
+
+    @Test
+    void addOrderDoesNotMatter() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("Test");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+        first.add("РусскийТекстПодлиннее");
+
+        second.add("РусскийТекстПодлиннее");
+        second.add("Test2String");
+        second.add("Test1String");
+        second.add("String");
+        second.add("Test2String");
+        second.add("Test");
+        second.add("Русский");
+        second.add("РусскийТекст");
+        second.add("test");
+        second.add("Test3String");
+
+        assertEquals(first, second);
+    }
+
+    @Test
+    void removeStringEqualsNotAdd() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+
+        second.add("РусскийТекстПодлиннее");
+        second.add("Test2String");
+        second.add("Test1String");
+        second.add("String");
+        second.add("Test2String");
+        second.add("Test");
+        second.add("Русский");
+        second.add("РусскийТекст");
+        second.add("test");
+        second.add("Test3String");
+
+        second.remove("Test");
+        second.remove("РусскийТекстПодлиннее");
+        second.remove("abacaba");
+
+        assertEquals(first, second);
+    }
+
+    @Test
+    void removeStringMakesNotEqual() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("Test");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+        first.add("РусскийТекстПодлиннее");
+
+        second.add("РусскийТекстПодлиннее");
+        second.add("Test2String");
+        second.add("Test1String");
+        second.add("String");
+        second.add("Test2String");
+        second.add("Test");
+        second.add("Русский");
+        second.add("РусскийТекст");
+        second.add("test");
+        second.add("Test3String");
+
+        second.remove("String");
+
+        assertNotEquals(first, second);
+    }
+
+    @Test
+    void removeAllEqualsEmpty() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("Test");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+        first.add("РусскийТекстПодлиннее");
+
+        first.remove("РусскийТекстПодлиннее");
+        first.remove("Test2String");
+        first.remove("Test1String");
+        first.remove("String");
+        first.remove("Test2String");
+        first.remove("Test");
+        first.remove("Русский");
+        first.remove("РусскийТекст");
+        first.remove("test");
+        first.remove("Test3String");
+
+        assertEquals(first, second);
+    }
+
+    // hashcode test
+
+    @Test
+    void emptyTriesHaveEqualHashCodes() {
+        var first = new Trie();
+        var second = new Trie();
+        assertEquals(first.hashCode(), second.hashCode());
+    }
+    @Test
+    void addOrderDoesNotMatterForHashCode() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("Test");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+        first.add("РусскийТекстПодлиннее");
+
+        second.add("РусскийТекстПодлиннее");
+        second.add("Test2String");
+        second.add("Test1String");
+        second.add("String");
+        second.add("Test2String");
+        second.add("Test");
+        second.add("Русский");
+        second.add("РусскийТекст");
+        second.add("test");
+        second.add("Test3String");
+
+        assertEquals(first.hashCode(), second.hashCode());
+    }
+
+    @Test
+    void removeStringEqualsNotAddForHashCode() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+
+        second.add("РусскийТекстПодлиннее");
+        second.add("Test2String");
+        second.add("Test1String");
+        second.add("String");
+        second.add("Test2String");
+        second.add("Test");
+        second.add("Русский");
+        second.add("РусскийТекст");
+        second.add("test");
+        second.add("Test3String");
+
+        second.remove("Test");
+        second.remove("РусскийТекстПодлиннее");
+        second.remove("abacaba");
+
+        assertEquals(first.hashCode(), second.hashCode());
+    }
+
+    @Test
+    void removeAllEqualsEmptyForHashCode() {
+        var first = new Trie();
+        var second = new Trie();
+
+        first.add("Test1String");
+        first.add("Test2String");
+        first.add("Test3String");
+        first.add("Test");
+        first.add("test");
+        first.add("String");
+        first.add("Test3String");
+        first.add("Русский");
+        first.add("РусскийТекст");
+        first.add("РусскийТекст");
+        first.add("РусскийТекстПодлиннее");
+
+        first.remove("РусскийТекстПодлиннее");
+        first.remove("Test2String");
+        first.remove("Test1String");
+        first.remove("String");
+        first.remove("Test2String");
+        first.remove("Test");
+        first.remove("Русский");
+        first.remove("РусскийТекст");
+        first.remove("test");
+        first.remove("Test3String");
+
+        assertEquals(first.hashCode(), second.hashCode());
+    }
+
+    // serialize/deserialize tests
+
+    @Test
+    void serializeEmpty() {
+        var actual = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> testTrie.serialize(actual));
+
+        var expected = new ByteArrayOutputStream();
+        var out = new DataOutputStream(expected);
+        assertDoesNotThrow((
+
+        ) -> out.writeInt(0));
+        assertDoesNotThrow(() -> out.writeBoolean(false));
+
+        assertArrayEquals(expected.toByteArray(), actual.toByteArray());
+    }
+
+    @Test
+    void serializeOneString() {
+        testTrie.add("abc");
+        var actual = new ByteArrayOutputStream();
+        assertDoesNotThrow(() -> testTrie.serialize(actual));
+
+        var expected = new ByteArrayOutputStream();
+        var expectedData = new DataOutputStream(expected);
+        assertDoesNotThrow(() -> expectedData.writeInt(1));
+        assertDoesNotThrow(() -> expectedData.writeBoolean(false));
+        assertDoesNotThrow(() -> expectedData.writeChar('a'));
+        assertDoesNotThrow(() -> expectedData.writeInt(1));
+        assertDoesNotThrow(() -> expectedData.writeBoolean(false));
+        assertDoesNotThrow(() -> expectedData.writeChar('b'));
+        assertDoesNotThrow(() -> expectedData.writeInt(1));
+        assertDoesNotThrow(() -> expectedData.writeBoolean(false));
+        assertDoesNotThrow(() -> expectedData.writeChar('c'));
+        assertDoesNotThrow(() -> expectedData.writeInt(0));
+        assertDoesNotThrow(() -> expectedData.writeBoolean(true));
+
+        assertArrayEquals(expected.toByteArray(), actual.toByteArray());
+    }
+
+    @Test
+    void deserializeEmpty() {
+        var in = new ByteArrayOutputStream();
+        var inData = new DataOutputStream(in);
+        assertDoesNotThrow(() -> inData.writeInt(0));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+
+        testTrie.add("abc");
+        assertDoesNotThrow(() -> testTrie.deserialize(new ByteArrayInputStream(in.toByteArray())));
+
+        assertEquals(new Trie(), testTrie);
+    }
+
+    @Test
+    void deserializeOneString() {
+        var in = new ByteArrayOutputStream();
+        var inData = new DataOutputStream(in);
+        assertDoesNotThrow(() -> inData.writeInt(1));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+        assertDoesNotThrow(() -> inData.writeChar('a'));
+        assertDoesNotThrow(() -> inData.writeInt(1));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+        assertDoesNotThrow(() -> inData.writeChar('b'));
+        assertDoesNotThrow(() -> inData.writeInt(1));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+        assertDoesNotThrow(() -> inData.writeChar('c'));
+        assertDoesNotThrow(() -> inData.writeInt(0));
+        assertDoesNotThrow(() -> inData.writeBoolean(true));
+
+        testTrie.add("def");
+        assertDoesNotThrow(() -> testTrie.deserialize(new ByteArrayInputStream(in.toByteArray())));
+
+        var expected = new Trie();
+        expected.add("abc");
+        assertEquals(expected, testTrie);
+    }
+
+    @Test
+    void deserializeTwoStrings() {
+        var in = new ByteArrayOutputStream();
+        var inData = new DataOutputStream(in);
+        assertDoesNotThrow(() -> inData.writeInt(1));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+        assertDoesNotThrow(() -> inData.writeChar('a'));
+        assertDoesNotThrow(() -> inData.writeInt(2));
+        assertDoesNotThrow(() -> inData.writeBoolean(false));
+        assertDoesNotThrow(() -> inData.writeChar('b'));
+        assertDoesNotThrow(() -> inData.writeInt(0));
+        assertDoesNotThrow(() -> inData.writeBoolean(true));
+        assertDoesNotThrow(() -> inData.writeChar('c'));
+        assertDoesNotThrow(() -> inData.writeInt(0));
+        assertDoesNotThrow(() -> inData.writeBoolean(true));
+
+        testTrie.add("def");
+        assertDoesNotThrow(() -> testTrie.deserialize(new ByteArrayInputStream(in.toByteArray())));
+
+        var expected = new Trie();
+        expected.add("ab");
+        expected.add("ac");
+        assertEquals(expected, testTrie);
+    }
+
     @Test
     void resultOfSerializeDeserializeEqualsSource() {
-        Trie from = new Trie(), to = new Trie();
+        var from = new Trie();
+        var to = new Trie();
         from.add("Test1String");
         from.add("Test2String");
         from.add("Test3String");
@@ -365,30 +728,14 @@ class TrieTest {
         var in = new ByteArrayInputStream(out.toByteArray());
         assertDoesNotThrow(() -> to.deserialize(in));
 
-        assertTrue(to.contains("Test1String"));
-        assertTrue(to.contains("Test2String"));
-        assertTrue(to.contains("Test3String"));
-        assertTrue(to.contains("Test"));
-        assertTrue(to.contains("test"));
-        assertTrue(to.contains("String"));
-        assertTrue(to.contains("Русский"));
-        assertTrue(to.contains("РусскийТекст"));
-        assertTrue(to.contains("РусскийТекстПодлиннее"));
-
-        assertFalse(to.contains(""));
-        assertFalse(to.contains("T"));
-        assertFalse(to.contains("Test1"));
-        assertFalse(to.contains("StrinG"));
-        assertFalse(to.contains("String2"));
-
-        assertFalse(to.contains("ABC"));
-        assertFalse(to.contains("def"));
-        assertFalse(to.contains("123"));
+        assertEquals(from, to);
     }
 
     @Test
     void serializeDeserializeEmptyTrie() {
-        Trie from = new Trie(), to = new Trie();
+        var from = new Trie();
+        var to = new Trie();
+
         to.add("ABC");
         to.add("def");
         to.add("123");
@@ -398,16 +745,14 @@ class TrieTest {
         var in = new ByteArrayInputStream(out.toByteArray());
         assertDoesNotThrow(() -> to.deserialize(in));
 
-        assertFalse(to.contains(""));
-        assertFalse(to.contains("T"));
-        assertFalse(to.contains("ABC"));
-        assertFalse(to.contains("def"));
-        assertFalse(to.contains("123"));
+        assertEquals(from, to);
     }
 
     @Test
     void canChangeTrieAfterDeserialize() {
-        Trie from = new Trie(), to = new Trie();
+        var from = new Trie();
+        var to = new Trie();
+
         from.add("Test1String");
         from.add("Test2String");
         from.add("Test3String");
@@ -459,7 +804,9 @@ class TrieTest {
 
     @Test
     void serializeAllCharacters() {
-        Trie from = new Trie(), to = new Trie();
+        var from = new Trie();
+        var to = new Trie();
+
         for (int c = 0; c <= Character.MAX_VALUE; c++) {
             from.add(Character.toString(c));
         }
@@ -469,8 +816,6 @@ class TrieTest {
         var in = new ByteArrayInputStream(out.toByteArray());
         assertDoesNotThrow(() -> to.deserialize(in));
 
-        for (int c = 0; c <= Character.MAX_VALUE; c++) {
-            assertTrue(to.contains(Character.toString(c)));
-        }
+        assertEquals(from, to);
     }
 }

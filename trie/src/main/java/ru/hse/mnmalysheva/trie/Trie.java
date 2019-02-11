@@ -18,16 +18,16 @@ public class Trie implements Serializable {
         @Override
         public int hashCode() {
             int hash = isTerminal ? 1 : 0;
-            for (var e : children.entrySet()) {
-                hash += e.getKey() * e.getValue().hashCode();
+            for (var entry : children.entrySet()) {
+                hash += entry.getKey() * entry.getValue().hashCode();
             }
             return hash;
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (o instanceof Node) {
-                var node = (Node) o;
+        public boolean equals(Object object) {
+            if (object instanceof Node) {
+                var node = (Node) object;
                 return isTerminal == node.isTerminal && size == node.size && children.equals(node.children);
             }
             return false;
@@ -46,11 +46,11 @@ public class Trie implements Serializable {
             if (position == element.length()) {
                 return switchTerminal(true);
             }
-            var nextChar = element.charAt(position);
-            var child = children.get(nextChar);
+            var nextCharacter = element.charAt(position);
+            var child = children.get(nextCharacter);
             if (child == null) {
                 child = new Node();
-                children.put(nextChar, child);
+                children.put(nextCharacter, child);
             }
             boolean added = child.add(element, position + 1);
             if (added) {
@@ -63,8 +63,8 @@ public class Trie implements Serializable {
             if (position == element.length()) {
                 return isTerminal;
             }
-            var nextChar = element.charAt(position);
-            var child = children.get(nextChar);
+            var nextCharacter = element.charAt(position);
+            var child = children.get(nextCharacter);
             if (child == null) {
                 return false;
             }
@@ -75,8 +75,8 @@ public class Trie implements Serializable {
             if (position == element.length()) {
                 return switchTerminal(false);
             }
-            var nextChar = element.charAt(position);
-            var child = children.get(nextChar);
+            var nextCharacter = element.charAt(position);
+            var child = children.get(nextCharacter);
             if (child == null) {
                 return false;
             }
@@ -84,7 +84,7 @@ public class Trie implements Serializable {
             if (removed) {
                 size--;
                 if (child.size == 0) {
-                    children.remove(nextChar);
+                    children.remove(nextCharacter);
                 }
             }
             return removed;
@@ -94,8 +94,8 @@ public class Trie implements Serializable {
             if (position == prefix.length()) {
                 return size;
             }
-            var nextChar = prefix.charAt(position);
-            var child = children.get(nextChar);
+            var nextCharacter = prefix.charAt(position);
+            var child = children.get(nextCharacter);
             if (child == null) {
                 return 0;
             }
@@ -105,20 +105,20 @@ public class Trie implements Serializable {
         private void serialize(@NotNull DataOutputStream out) throws IOException {
             out.writeInt(children.size());
             out.writeBoolean(isTerminal);
-            for (var e : children.entrySet()) {
-                out.writeChar(e.getKey());
-                e.getValue().serialize(out);
+            for (var entry : children.entrySet()) {
+                out.writeChar(entry.getKey());
+                entry.getValue().serialize(out);
             }
         }
 
         private void deserialize(@NotNull DataInputStream in) throws IOException {
-            var n = in.readInt();
+            var numberOfChildren = in.readInt();
             isTerminal = in.readBoolean();
             size = isTerminal ? 1 : 0;
-            for (int i = 0; i < n; i++) {
-                var nextChar = in.readChar();
+            for (int i = 0; i < numberOfChildren; i++) {
+                var nextCharacter = in.readChar();
                 var child = new Node();
-                children.put(nextChar, child);
+                children.put(nextCharacter, child);
                 child.deserialize(in);
                 size += child.size;
             }
@@ -135,9 +135,9 @@ public class Trie implements Serializable {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof Trie) {
-            var trie = (Trie) o;
+    public boolean equals(Object object) {
+        if (object instanceof Trie) {
+            var trie = (Trie) object;
             return root.equals(trie.root);
         }
         return false;

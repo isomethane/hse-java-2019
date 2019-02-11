@@ -34,7 +34,7 @@ public class HashTable {
 
     private static final int EMPTY_TABLE_SIZE = 1;
     private List[] table;
-    private int numOfKeys;
+    private int numberOfKeys;
 
     /** String hash code cropped to size of array. */
     private int getHash(@NotNull String key) {
@@ -43,7 +43,7 @@ public class HashTable {
 
     /** Init array of specified size. */
     private void initTable(int size) {
-        numOfKeys = 0;
+        numberOfKeys = 0;
         table = new List[size];
         for (int i = 0; i < size; i++) {
             table[i] = new List();
@@ -70,7 +70,7 @@ public class HashTable {
 
     /** Number of keys in table. */
     public int size() {
-        return numOfKeys;
+        return numberOfKeys;
     }
 
     /** Check if table contains key. */
@@ -101,8 +101,8 @@ public class HashTable {
         }
 
         list.add(data);
-        numOfKeys++;
-        if (numOfKeys >= table.length) {
+        numberOfKeys++;
+        if (numberOfKeys >= table.length) {
             resize(table.length * 2);
         }
         return null;
@@ -116,8 +116,8 @@ public class HashTable {
         if (removed == null) {
             return null;
         }
-        numOfKeys--;
-        if (numOfKeys * 4 < table.length) {
+        numberOfKeys--;
+        if (numberOfKeys * 4 < table.length) {
             resize(Math.max(EMPTY_TABLE_SIZE, table.length / 2));
         }
         return removed.value;

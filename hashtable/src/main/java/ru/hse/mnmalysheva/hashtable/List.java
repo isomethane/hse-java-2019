@@ -60,8 +60,8 @@ public class List {
      * @return Null if no element was found, founded element otherwise.
      */
     public @Nullable Object find(@NotNull Object o) {
-        for (var cur = head.next; cur != null; cur = cur.next) {
-            var data = cur.data;
+        for (var current = head.next; current != null; current = current.next) {
+            var data = current.data;
             if (data.equals(o)) {
                 return data;
             }

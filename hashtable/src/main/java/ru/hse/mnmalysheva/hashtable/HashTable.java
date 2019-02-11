@@ -92,11 +92,11 @@ public class HashTable {
     public String put(@NotNull String key, @NotNull String value) {
         var list = table[getHash(key)];
         var data = new Pair(key, value);
-        var prev = (Pair) list.find(data);
+        var previous = (Pair) list.find(data);
 
-        if (prev != null) {
-            var prevValue = prev.value;
-            prev.value = value;
+        if (previous != null) {
+            var prevValue = previous.value;
+            previous.value = value;
             return prevValue;
         }
 

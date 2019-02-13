@@ -129,13 +129,13 @@ public class Trie implements Serializable {
 
     private Node root = new Node();
 
-    /** {@inheritDoc} */
+    /** Returns trie hash code. **/
     @Override
     public int hashCode() {
         return root.hashCode();
     }
 
-    /** {@inheritDoc} */
+    /** Returns true if specified object is trie and contains the same set of strings. **/
     @Override
     public boolean equals(Object object) {
         if (object instanceof Trie) {

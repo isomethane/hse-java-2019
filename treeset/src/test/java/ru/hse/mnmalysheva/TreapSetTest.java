@@ -1,5 +1,6 @@
 package ru.hse.mnmalysheva;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +20,7 @@ class TreapSetTest {
         reverseIntSet = intSet.descendingSet();
     }
 
-    // comparator test
+    // comparator tests
 
     @Test
     void comparatorConstructorWorksCorrectly() {
@@ -32,6 +33,81 @@ class TreapSetTest {
         assertEquals("xyz", it.next());
         assertEquals("ijk", it.next());
         assertEquals("abcd", it.next());
+    }
+
+    @Test
+    void nullsCanBeStoredWithOkComparator() {
+        intSet = new TreapSet<>((a, b) ->
+                a == null ?
+                        b == null ?
+                                0 :
+                                Integer.compare(0, b) :
+                        b == null ?
+                                a.compareTo(0) :
+                                a.compareTo(b));
+        intSet.add(1);
+        intSet.add(3);
+        assertTrue(intSet.add(null));
+        assertFalse(intSet.add(0));
+        intSet.add(-1);
+        intSet.add(2);
+        var it = intSet.iterator();
+        assertEquals(-1, it.next().intValue());
+        assertNull(it.next());
+        assertEquals(1, it.next().intValue());
+        assertEquals(2, it.next().intValue());
+        assertEquals(3, it.next().intValue());
+        assertFalse(it.hasNext());
+
+        assertTrue(intSet.remove(0));
+        assertTrue(intSet.add(0));
+        assertFalse(intSet.add(null));
+        it = intSet.iterator();
+        assertEquals(-1, it.next().intValue());
+        assertEquals(0, it.next().intValue());
+        assertEquals(1, it.next().intValue());
+        assertEquals(2, it.next().intValue());
+        assertEquals(3, it.next().intValue());
+        assertFalse(it.hasNext());
+    }
+
+    @Test
+    void canRemoveOtherTypeThatCanCompareToWithNoComparator() {
+        class StrangeInt implements Comparable<StrangeInt> {
+            int value;
+            StrangeInt(int value) { this.value = value; }
+            @Override
+            public boolean equals(Object o) {
+                if (o instanceof StrangeInt) {
+                    return value == ((StrangeInt) o).value;
+                }
+                return false;
+            }
+
+            @Override
+            public int compareTo(@NotNull StrangeInt o) {
+                return Integer.compare(value, o.value);
+            }
+        }
+        class StrangeIntFoo extends StrangeInt {
+            String foo = "foo";
+            StrangeIntFoo(int value) { super(value); }
+        }
+        class StrangeIntBar extends StrangeInt {
+            String bar = "bar";
+            StrangeIntBar(int value) { super(value); }
+        }
+        var strangeIntSet = new TreapSet<StrangeIntFoo>();
+        strangeIntSet.add(new StrangeIntFoo(1));
+        strangeIntSet.add(new StrangeIntFoo(3));
+        strangeIntSet.add(new StrangeIntFoo(2));
+        strangeIntSet.add(new StrangeIntFoo(4));
+        assertTrue(strangeIntSet.remove(new StrangeIntBar(2)));
+        var it = strangeIntSet.iterator();
+        assertEquals(new StrangeInt(1), it.next());
+        assertEquals(new StrangeInt(3), it.next());
+        assertEquals(new StrangeInt(4), it.next());
+        assertFalse(it.hasNext());
     }
 
     // size tests

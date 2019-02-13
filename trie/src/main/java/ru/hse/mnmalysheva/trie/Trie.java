@@ -10,6 +10,68 @@ import java.util.Hashtable;
  * Allows to add, find and remove strings in O(length).
  */
 public class Trie implements Serializable {
+    private Node root = new Node();
+
+    /** Returns trie hash code. **/
+    @Override
+    public int hashCode() {
+        return root.hashCode();
+    }
+
+    /** Returns true if specified object is trie and contains the same set of strings. **/
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Trie) {
+            var trie = (Trie) object;
+            return root.equals(trie.root);
+        }
+        return false;
+    }
+
+    /** Add string to trie.
+     * @param element String to add.
+     * @return true if trie did not contain this string, false otherwise.
+     */
+    public boolean add(@NotNull String element) {
+        return root.add(element, 0);
+    }
+
+    /** Check if trie contains specified string. */
+    public boolean contains(@NotNull String element) {
+        return root.contains(element, 0);
+    }
+
+    /** Remove string from trie.
+     * @param element String to remove.
+     * @return true if trie contained this string, false otherwise.
+     */
+    public boolean remove(@NotNull String element) {
+        return root.remove(element, 0);
+    }
+
+    /** Number of strings in trie. */
+    public int size() {
+        return root.numberOfTerminalsInSubtree;
+    }
+
+    /** Number of strings starting with specified prefix. */
+    public int howManyStartWithPrefix(@NotNull String prefix) {
+        return root.howManyStartWithPrefix(prefix, 0);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void serialize(@NotNull OutputStream out) throws IOException {
+        root.serialize(new DataOutputStream(out));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void deserialize(@NotNull InputStream in) throws IOException {
+        root = new Node();
+        root.deserialize(new DataInputStream(in));
+    }
+
     private static class Node {
         private boolean isTerminal = false;
         private int numberOfTerminalsInSubtree;
@@ -125,67 +187,5 @@ public class Trie implements Serializable {
                 numberOfTerminalsInSubtree += child.numberOfTerminalsInSubtree;
             }
         }
-    }
-
-    private Node root = new Node();
-
-    /** Returns trie hash code. **/
-    @Override
-    public int hashCode() {
-        return root.hashCode();
-    }
-
-    /** Returns true if specified object is trie and contains the same set of strings. **/
-    @Override
-    public boolean equals(Object object) {
-        if (object instanceof Trie) {
-            var trie = (Trie) object;
-            return root.equals(trie.root);
-        }
-        return false;
-    }
-
-    /** Add string to trie.
-     * @param element String to add.
-     * @return true if trie did not contain this string, false otherwise.
-     */
-    public boolean add(@NotNull String element) {
-        return root.add(element, 0);
-    }
-
-    /** Check if trie contains specified string. */
-    public boolean contains(@NotNull String element) {
-        return root.contains(element, 0);
-    }
-
-    /** Remove string from trie.
-     * @param element String to remove.
-     * @return true if trie contained this string, false otherwise.
-     */
-    public boolean remove(@NotNull String element) {
-        return root.remove(element, 0);
-    }
-
-    /** Number of strings in trie. */
-    public int size() {
-        return root.numberOfTerminalsInSubtree;
-    }
-
-    /** Number of strings starting with specified prefix. */
-    public int howManyStartWithPrefix(@NotNull String prefix) {
-        return root.howManyStartWithPrefix(prefix, 0);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void serialize(@NotNull OutputStream out) throws IOException {
-        root.serialize(new DataOutputStream(out));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void deserialize(@NotNull InputStream in) throws IOException {
-        root = new Node();
-        root.deserialize(new DataInputStream(in));
     }
 }

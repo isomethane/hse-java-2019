@@ -2,37 +2,32 @@ package ru.hse.mnmalysheva;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /** Search tree set interface. */
 public interface MyTreeSet<E> extends Set<E> {
 
-    /** Returns an iterator over the elements in this set in descending order. */
+    /** {@link TreeSet#descendingIterator()} **/
     @NotNull Iterator<E> descendingIterator();
 
-    /**
-     * Returns a reverse order view of the elements contained in this set.
-     * Changes to the set are reflected in the descending set, and vice-versa.
-     * The returned set has an ordering equivalent to Collections.reverseOrder(comparator()).
-     */
+    /** {@link TreeSet#descendingSet()} **/
     @NotNull MyTreeSet<E> descendingSet();
 
-    /** Returns the first (lowest) element currently in this set. */
+    /** {@link TreeSet#first()} **/
     E first();
 
-    /** Returns the last (highest) element currently in this set. */
+    /** {@link TreeSet#last()} **/
     E last();
 
-    /** Returns the greatest element in set less than the given element, or null if there is no such element. */
+    /** {@link TreeSet#lower(Object)} **/
     E lower(E element);
 
-    /** Returns the least element in set greater than the given element, or null if there is no such element. */
+    /** {@link TreeSet#higher(Object)} **/
     E higher(E element);
 
-    /** Returns the greatest element in set not greater than the given element, or null if there is no such element. */
+    /** {@link TreeSet#floor(Object)} **/
     E floor(E element);
 
-    /** Returns the least element in set not less than the given element, or null if there is no such element. */
+    /** {@link TreeSet#ceiling(Object)} **/
     E ceiling(E element);
 }

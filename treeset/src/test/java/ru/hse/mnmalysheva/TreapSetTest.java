@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -202,7 +203,7 @@ class TreapSetTest {
     }
 
     @Test
-    void iteratorNextThrowsIllegalStateExceptionAfterModification() {
+    void iteratorNextThrowsConcurrentModificationExceptionAfterModification() {
         intSet.add(2);
         intSet.add(4);
         intSet.add(1);
@@ -213,13 +214,13 @@ class TreapSetTest {
         it.next();
         it.next();
         intSet.add(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = intSet.iterator();
         it.next();
         it.next();
         intSet.remove(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
     }
 
     @Test
@@ -301,7 +302,7 @@ class TreapSetTest {
     }
 
     @Test
-    void descendingIteratorNextThrowsIllegalStateExceptionAfterModification() {
+    void descendingIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
         intSet.add(2);
         intSet.add(4);
         intSet.add(1);
@@ -312,13 +313,13 @@ class TreapSetTest {
         it.next();
         it.next();
         intSet.add(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = intSet.descendingIterator();
         it.next();
         it.next();
         intSet.remove(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
     }
 
     // first tests
@@ -655,7 +656,7 @@ class TreapSetTest {
     }
 
     @Test
-    void descendingSetIteratorNextThrowsIllegalStateExceptionAfterModification() {
+    void descendingSetIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
         reverseIntSet.add(2);
         reverseIntSet.add(4);
         reverseIntSet.add(1);
@@ -666,25 +667,25 @@ class TreapSetTest {
         it.next();
         it.next();
         reverseIntSet.add(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = reverseIntSet.iterator();
         it.next();
         it.next();
         reverseIntSet.remove(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = reverseIntSet.iterator();
         it.next();
         it.next();
         intSet.add(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = reverseIntSet.iterator();
         it.next();
         it.next();
         intSet.remove(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
     }
 
     @Test
@@ -778,7 +779,7 @@ class TreapSetTest {
     }
 
     @Test
-    void descendingSetDescendingIteratorNextThrowsIllegalStateExceptionAfterModification() {
+    void descendingSetDescendingIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
         reverseIntSet.add(2);
         reverseIntSet.add(4);
         reverseIntSet.add(1);
@@ -789,13 +790,13 @@ class TreapSetTest {
         it.next();
         it.next();
         reverseIntSet.add(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
 
         it = reverseIntSet.descendingIterator();
         it.next();
         it.next();
         reverseIntSet.remove(6);
-        assertThrows(IllegalStateException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::next);
     }
 
     // descending set first tests

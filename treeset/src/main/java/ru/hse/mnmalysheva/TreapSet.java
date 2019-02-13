@@ -1,6 +1,7 @@
 package ru.hse.mnmalysheva;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -14,38 +15,24 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     private MyTreeSet<E> descendingSet = new DescendingSet();
     private Comparator<? super E> comparator;
 
-    /**
-     * Constructs an empty treap set, sorted according to the natural ordering of its elements.
-     * All elements inserted into the set must implement the Comparable interface.
-     * Furthermore, all such elements must be mutually comparable.
-     */
+    /** {@link TreeSet#TreeSet()} **/
     public TreapSet() {}
 
-    /**
-     * Constructs a new, empty treap set, sorted according to the specified comparator.
-     * All elements inserted into the set must be mutually comparable by the specified comparator.
-     * @param comparator the comparator that will be used to order this set.
-     *                   If null, the natural ordering of the elements will be used.
-     */
-    public TreapSet(Comparator<? super E> comparator) {
+    /** {@link TreeSet#TreeSet(Comparator)} **/
+    public TreapSet(@Nullable Comparator<? super E> comparator) {
         this.comparator = comparator;
     }
 
-    /** Returns the number of elements in set. */
+    /** {@link TreeSet#size()} **/
     @Override
     public int size() {
         return root.size;
     }
 
-    /**
-     * Adds the specified element to set if it is not already present.
-     * If this set already contains the element, the call leaves the set unchanged and returns false.
-     * @param element element to be added to this set
-     * @return true if this set did not already contain the specified element, false otherwise
-     */
+    /** {@link TreeSet#add(Object)} **/
     @Override
-    public boolean add(@NotNull E element) {
-        if (element.equals(find(element).data)) {
+    public boolean add(@Nullable E element) {
+        if (root != nullNode && compare(element, find(element).data) == 0) {
             return false;
         }
         NodePair splited = split(root, element);
@@ -54,31 +41,25 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return true;
     }
 
-    /**
-     * Removes the specified element from this set if it is present.
-     * Returns true if this set contained the element.
-     * @param object object to be removed from this set, if present
-     * @return true if this set contained the specified element, false otherwise
-     */
+    /** {@link TreeSet#remove(Object)} **/
     @Override
-    public boolean remove(@NotNull Object object) {
-        for (var node = firstNode(root); node != nullNode; node = nextNode(node)) {
-            if (object.equals(node.data)) {
-                var nextNode = nextNode(node);
-                if (nextNode == nullNode) {
-                    root = split(root, node.data).left;
-                } else {
-                    NodePair splited = split(root, node.data);
-                    root = merge(splited.left, split(splited.right, nextNode.data).right);
-                }
-                treeVersion++;
-                return true;
-            }
+    public boolean remove(@Nullable Object element) {
+        var node = find(element);
+        if (root == nullNode || compare(element, node.data) != 0) {
+            return false;
         }
-        return false;
+        var nextNode = nextNode(node);
+        if (nextNode == nullNode) {
+            root = split(root, node.data).left;
+        } else {
+            NodePair splited = split(root, node.data);
+            root = merge(splited.left, split(splited.right, nextNode.data).right);
+        }
+        treeVersion++;
+        return true;
     }
 
-    /** Returns an iterator over the elements in this set in ascending order. */
+    /** {@link TreeSet#iterator()} **/
     @Override
     public @NotNull Iterator<E> iterator() {
         return new TreeIterator(firstNode(root));
@@ -98,7 +79,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E first() {
+    public @Nullable E first() {
         if (root == nullNode) {
             throw new NoSuchElementException("Set is empty.");
         }
@@ -107,7 +88,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E last() {
+    public @Nullable E last() {
         if (root == nullNode) {
             throw new NoSuchElementException("Set is empty.");
         }
@@ -116,7 +97,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E lower(E element) {
+    public @Nullable E lower(@Nullable E element) {
         var node = find(element);
         if (node == nullNode || compare(node.data, element) < 0) {
             return node.data;
@@ -126,7 +107,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E higher(E element) {
+    public @Nullable E higher(@Nullable E element) {
         var node = find(element);
         if (node == nullNode || compare(node.data, element) > 0) {
             return node.data;
@@ -136,7 +117,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E floor(E element) {
+    public @Nullable E floor(@Nullable E element) {
         var node = find(element);
         if (node == nullNode || compare(node.data, element) <= 0) {
             return node.data;
@@ -146,7 +127,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     /** {@inheritDoc} */
     @Override
-    public E ceiling(E element) {
+    public @Nullable E ceiling(@Nullable E element) {
         var node = find(element);
         if (node == nullNode || compare(node.data, element) >= 0) {
             return node.data;
@@ -182,7 +163,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return right;
     }
 
-    private Node find(Node root, E element) {
+    private Node find(Node root, Object element) {
         if (compare(root.data, element) < 0) {
             return root.right == nullNode ? root : find(root.right, element);
         }
@@ -192,7 +173,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return root;
     }
 
-    private Node find(E element) {
+    private Node find(Object element) {
         return root == nullNode ? nullNode : find(root, element);
     }
 
@@ -232,13 +213,12 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return node.parent;
     }
 
-    private int compare(E first, E second) {
+    @SuppressWarnings("unchecked")
+    private int compare(Object first, Object second) {
         if (comparator == null) {
-            @SuppressWarnings("unchecked")
-            var comparableFirst = (Comparable<E>) first;
-            return comparableFirst.compareTo(second);
+            return ((Comparable) first).compareTo(second);
         }
-        return comparator.compare(first, second);
+        return comparator.compare((E) first, (E) second);
     }
 
     private class Node {
@@ -249,6 +229,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         private int priority;
         private int size;
 
+        // null node constructor
         private Node() {
             left = this;
             right = this;
@@ -314,7 +295,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         private void checkState() {
             if (version != treeVersion) {
-                throw new IllegalStateException("Iterator invalidated after modification.");
+                throw new ConcurrentModificationException("Iterator invalidated after modification.");
             }
         }
 

@@ -12,7 +12,7 @@ import java.util.Hashtable;
 public class Trie implements Serializable {
     private static class Node {
         private boolean isTerminal = false;
-        private int size = 0;
+        private int numberOfTerminalsInSubtree;
         private final Hashtable<Character, Node> children = new Hashtable<>();
 
         @Override
@@ -28,7 +28,9 @@ public class Trie implements Serializable {
         public boolean equals(Object object) {
             if (object instanceof Node) {
                 var node = (Node) object;
-                return isTerminal == node.isTerminal && size == node.size && children.equals(node.children);
+                return isTerminal == node.isTerminal &&
+                        numberOfTerminalsInSubtree == node.numberOfTerminalsInSubtree &&
+                        children.equals(node.children);
             }
             return false;
         }
@@ -38,7 +40,7 @@ public class Trie implements Serializable {
                 return false;
             }
             isTerminal = state;
-            size += isTerminal ? 1 : -1;
+            numberOfTerminalsInSubtree += isTerminal ? 1 : -1;
             return true;
         }
 
@@ -54,7 +56,7 @@ public class Trie implements Serializable {
             }
             boolean added = child.add(element, position + 1);
             if (added) {
-                size++;
+                numberOfTerminalsInSubtree++;
             }
             return added;
         }
@@ -82,8 +84,8 @@ public class Trie implements Serializable {
             }
             boolean removed = child.remove(element, position + 1);
             if (removed) {
-                size--;
-                if (child.size == 0) {
+                numberOfTerminalsInSubtree--;
+                if (child.numberOfTerminalsInSubtree == 0) {
                     children.remove(nextCharacter);
                 }
             }
@@ -92,7 +94,7 @@ public class Trie implements Serializable {
 
         private int howManyStartWithPrefix(@NotNull String prefix, int position) {
             if (position == prefix.length()) {
-                return size;
+                return numberOfTerminalsInSubtree;
             }
             var nextCharacter = prefix.charAt(position);
             var child = children.get(nextCharacter);
@@ -114,13 +116,13 @@ public class Trie implements Serializable {
         private void deserialize(@NotNull DataInputStream in) throws IOException {
             var numberOfChildren = in.readInt();
             isTerminal = in.readBoolean();
-            size = isTerminal ? 1 : 0;
+            numberOfTerminalsInSubtree = isTerminal ? 1 : 0;
             for (int i = 0; i < numberOfChildren; i++) {
                 var nextCharacter = in.readChar();
                 var child = new Node();
                 children.put(nextCharacter, child);
                 child.deserialize(in);
-                size += child.size;
+                numberOfTerminalsInSubtree += child.numberOfTerminalsInSubtree;
             }
         }
     }
@@ -166,7 +168,7 @@ public class Trie implements Serializable {
 
     /** Number of strings in trie. */
     public int size() {
-        return root.size;
+        return root.numberOfTerminalsInSubtree;
     }
 
     /** Number of strings starting with specified prefix. */

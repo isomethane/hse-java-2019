@@ -304,22 +304,14 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     private class TreeIterator implements Iterator<E> {
-        protected Node next;
-        private final int treeVersion;
+        private int treeVersion;
+        private Node previous;
+        private Node next;
+        private boolean canRemove;
 
         private TreeIterator(Node next) {
             this.next = next;
             treeVersion = version;
-        }
-
-        private void checkState() {
-            if (treeVersion != version) {
-                throw new ConcurrentModificationException("Iterator invalidated after modification.");
-            }
-        }
-
-        protected void goNext() {
-            next = nextNode(next);
         }
 
         @Override
@@ -338,6 +330,41 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             goNext();
             return result;
         }
+
+        @Override
+        public void remove() {
+            checkState();
+            if (!canRemove) {
+                if (previous == null) {
+                    throw new IllegalStateException(
+                            "Cannot remove element. The next method has not yet been called."
+                    );
+                }
+                throw new IllegalStateException(
+                        "Cannot remove element. " +
+                        "The remove method has already been called after the last call to the next method."
+                );
+            }
+            TreapSet.this.remove(previous.data);
+            treeVersion = version;
+            canRemove = false;
+        }
+
+        private void checkState() {
+            if (treeVersion != version) {
+                throw new ConcurrentModificationException("Iterator invalidated after modification.");
+            }
+        }
+
+        protected Node getNext(Node node) {
+            return nextNode(node);
+        }
+
+        private void goNext() {
+            previous = next;
+            next = getNext(next);
+            canRemove = true;
+        }
     }
 
     private class DescendingTreeIterator extends TreeIterator implements Iterator<E> {
@@ -346,8 +373,8 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        protected void goNext() {
-            next = previousNode(next);
+        protected Node getNext(Node node) {
+            return previousNode(node);
         }
     }
 

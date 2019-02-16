@@ -29,10 +29,29 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return root.size;
     }
 
+    /** {@link TreeSet#isEmpty()} **/
+    @Override
+    public boolean isEmpty() {
+        return root == nullNode;
+    }
+
+    /** {@link TreeSet#clear()} **/
+    @Override
+    public void clear() {
+        root = nullNode;
+        treeVersion++;
+    }
+
+    /** {@link TreeSet#contains(Object)} **/
+    @Override
+    public boolean contains(@Nullable Object element) {
+        return !isEmpty() && compare(element, find(element).data) == 0;
+    }
+
     /** {@link TreeSet#add(Object)} **/
     @Override
     public boolean add(@Nullable E element) {
-        if (root != nullNode && compare(element, find(element).data) == 0) {
+        if (contains(element)) {
             return false;
         }
         NodePair splited = split(root, element);

@@ -4,68 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 /** Chained hash table with string keys and values */
 public class HashTable {
-    /** Key-value pair */
-    private static class Pair {
-        private final String key;
-        private String value;
-
-        private Pair(@NotNull String key) {
-            this.key = key;
-        }
-
-        private Pair(@NotNull String key, @NotNull String value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        /** Compare the specified object with this pair for equality.
-         * Pairs are equal if their key are equal.
-         * Pair is equal to string if key is equal to this string.
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof Pair) {
-                var p = (Pair) o;
-                return key.equals(p.key);
-            }
-            return false;
-        }
-    }
-
-    private static final int EMPTY_TABLE_SIZE = 1;
-    private List[] table;
+    private static final int DEFAULT_TABLE_SIZE = 1000;
+    private List<Entry>[] table;
     private int numberOfKeys;
 
-    /** String hash code cropped to size of array. */
-    private int getHash(@NotNull String key) {
-        return Math.abs(key.hashCode() % table.length);
-    }
-
-    /** Init array of specified size. */
-    private void initTable(int size) {
-        numberOfKeys = 0;
-        table = new List[size];
-        for (int i = 0; i < size; i++) {
-            table[i] = new List();
-        }
-    }
-
-    /** Change array size.
-     * @param size New array size.
-     */
-    private void resize(int size) {
-        var oldTable = table;
-        initTable(size);
-        for (var list : oldTable) {
-            while (!list.isEmpty()) {
-                var p = (Pair) list.removeFirst();
-                put(p.key, p.value);
-            }
-        }
-    }
-
     public HashTable() {
-        initTable(EMPTY_TABLE_SIZE);
+        initTable(DEFAULT_TABLE_SIZE);
     }
 
     /** Number of keys in table. */
@@ -82,8 +26,12 @@ public class HashTable {
      * @return value if table contains key, null otherwise.
      */
     public String get(@NotNull String key) {
-        var result = (Pair) table[getHash(key)].find(new Pair(key));
-        return result == null ? null : result.value;
+        for (var entry : table[getHash(key)]) {
+            if (entry.key.equals(key)) {
+                return entry.value;
+            }
+        }
+        return null;
     }
 
     /** Put key to table.
@@ -91,40 +39,87 @@ public class HashTable {
      */
     public String put(@NotNull String key, @NotNull String value) {
         var list = table[getHash(key)];
-        var data = new Pair(key, value);
-        var previous = (Pair) list.find(data);
-
-        if (previous != null) {
-            var prevValue = previous.value;
-            previous.value = value;
-            return prevValue;
+        Entry previousEntry = null;
+        String previousValue = null;
+        for (Entry entry : list) {
+            if (entry.key.equals(key)) {
+                previousEntry = entry;
+                previousValue = entry.value;
+                break;
+            }
         }
-
-        list.add(data);
-        numberOfKeys++;
-        if (numberOfKeys >= table.length) {
-            resize(table.length * 2);
+        if (previousEntry != null) {
+            previousEntry.value = value;
+        } else {
+            list.add(new Entry(key, value));
+            numberOfKeys++;
+            adjustTableSize();
         }
-        return null;
+        return previousValue;
     }
 
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
     public String remove(@NotNull String key) {
-        var removed = (Pair) table[getHash(key)].remove(new Pair(key));
-        if (removed == null) {
-            return null;
+        String removedValue = null;
+        for (var iterator = table[getHash(key)].iterator(); iterator.hasNext(); ) {
+            var entry = iterator.next();
+            if (entry.key.equals(key)) {
+                removedValue = entry.value;
+                iterator.remove();
+                numberOfKeys--;
+                adjustTableSize();
+                break;
+            }
         }
-        numberOfKeys--;
-        if (numberOfKeys * 4 < table.length) {
-            resize(Math.max(EMPTY_TABLE_SIZE, table.length / 2));
-        }
-        return removed.value;
+        return removedValue;
     }
 
     /** Remove all keys. */
     public void clear() {
-        initTable(EMPTY_TABLE_SIZE);
+        initTable(DEFAULT_TABLE_SIZE);
+        numberOfKeys = 0;
+    }
+
+    private int getHash(@NotNull String key) {
+        return Math.abs(key.hashCode() % table.length);
+    }
+
+    private void initTable(int size) {
+        @SuppressWarnings("unchecked")
+        var listArray = (List<Entry>[]) new List[size];
+        table = listArray;
+        for (int i = 0; i < size; i++) {
+            table[i] = new List<>();
+        }
+    }
+
+    private void resize(int size) {
+        var oldTable = table;
+        initTable(size);
+        for (var list : oldTable) {
+            for (var entry : list) {
+                table[getHash(entry.key)].add(entry);
+            }
+        }
+    }
+
+    private void adjustTableSize() {
+        if (numberOfKeys >= table.length) {
+            resize(table.length * 2);
+        } else if (table.length > DEFAULT_TABLE_SIZE && numberOfKeys * 4 < table.length) {
+            resize(table.length / 2);
+        }
+    }
+
+    private static class Entry {
+        private final String key;
+        private String value;
+
+        private Entry(@NotNull String key, @NotNull String value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 }

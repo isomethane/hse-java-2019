@@ -1,81 +1,82 @@
 package ru.hse.mnmalysheva.hashtable;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /** Singly linked list. */
-public class List {
-    /** Singly linked list node. */
-    private static class Node {
-        /** Node content. */
-        private Object data;
-        /** Link to next node. */
-        private Node next;
-
-        private Node(Object data) {
-            this.data = data;
-        }
-
-        private Node(Object data, Node next) {
-            this.data = data;
-            this.next = next;
-        }
-    }
-
+public class List<E> implements Iterable<E> {
     /** Fictive head. */
-    private Node head = new Node(null);
+    private Node<E> head = new Node<>(null);
 
     /** Add element at list beginning. */
-    public void add(@NotNull Object data) {
-        head.next = new Node(data, head.next);
-    }
-
-    /** Remove the first occurrence of the specified element in list.
-     * @return Null if no element was found, removed element otherwise.
-     */
-    public @Nullable Object remove(@NotNull Object o) {
-        for (Node prev = head, cur = prev.next; cur != null; prev = cur, cur = cur.next) {
-            var data = cur.data;
-            if (data.equals(o)) {
-                prev.next = cur.next;
-                return data;
-            }
-        }
-        return null;
-    }
-
-    /** Remove first element.
-     * @return Removed element.
-     */
-    public Object removeFirst() {
-        var first = head.next;
-        if (first == null) {
-            throw new IllegalStateException("Trying to remove first element of empty list.");
-        }
-        head.next = first.next;
-        return first.data;
-    }
-
-    /** Find the first occurrence of the specified element in list.
-     * @return Null if no element was found, founded element otherwise.
-     */
-    public @Nullable Object find(@NotNull Object o) {
-        for (var current = head.next; current != null; current = current.next) {
-            var data = current.data;
-            if (data.equals(o)) {
-                return data;
-            }
-        }
-        return null;
-    }
-
-    /** Check if list is empty. */
-    public boolean isEmpty() {
-        return head.next == null;
+    public void add(@NotNull E element) {
+        head.next = new Node<>(element, head.next);
     }
 
     /** Remove all elements from list. */
     public void clear() {
         head.next = null;
+    }
+
+    @Override
+    public @NotNull Iterator<E> iterator() {
+        return new ListForwardIterator<>(head);
+    }
+
+    private static class Node<E> {
+        private E data;
+        private Node<E> next;
+
+        private Node(E data) {
+            this.data = data;
+        }
+
+        private Node(E data, Node<E> next) {
+            this.data = data;
+            this.next = next;
+        }
+    }
+
+    private static class ListForwardIterator<E> implements Iterator<E> {
+        private Node<E> previous;
+        private Node<E> current;
+        private boolean canRemove;
+
+        private ListForwardIterator(Node<E> head) {
+            current = head;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return current.next != null;
+        }
+
+        @Override
+        public @NotNull E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException("The iteration has no more elements.");
+            }
+            previous = current;
+            current = current.next;
+            canRemove = true;
+            return current.data;
+        }
+
+        @Override
+        public void remove() {
+            if (!canRemove) {
+                if (previous == null) {
+                    throw new IllegalStateException("Cannot remove element. " +
+                            "The next method has not yet been called.");
+                }
+                throw new IllegalStateException("Cannot remove element. " +
+                        "The remove method has already been called after the last call to the next method.");
+            }
+            previous.next = current.next;
+            current = previous;
+            canRemove = false;
+        }
     }
 }

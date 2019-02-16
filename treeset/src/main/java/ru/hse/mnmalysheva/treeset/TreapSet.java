@@ -29,12 +29,6 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return root.subtreeSize;
     }
 
-    /** {@link TreeSet#isEmpty()} **/
-    @Override
-    public boolean isEmpty() {
-        return root == nullNode;
-    }
-
     /** {@link TreeSet#clear()} **/
     @Override
     public void clear() {
@@ -385,13 +379,23 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        public boolean add(E e) {
-            return TreapSet.this.add(e);
+        public void clear() {
+            TreapSet.this.clear();
         }
 
         @Override
-        public boolean remove(Object o) {
-            return TreapSet.this.remove(o);
+        public boolean contains(Object element) {
+            return TreapSet.this.contains(element);
+        }
+
+        @Override
+        public boolean add(E element) {
+            return TreapSet.this.add(element);
+        }
+
+        @Override
+        public boolean remove(Object element) {
+            return TreapSet.this.remove(element);
         }
 
         @Override
@@ -420,23 +424,23 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        public E lower(E e) {
-            return TreapSet.this.higher(e);
+        public E lower(E element) {
+            return TreapSet.this.higher(element);
         }
 
         @Override
-        public E higher(E e) {
-            return TreapSet.this.lower(e);
+        public E higher(E element) {
+            return TreapSet.this.lower(element);
         }
 
         @Override
-        public E floor(E e) {
-            return TreapSet.this.ceiling(e);
+        public E floor(E element) {
+            return TreapSet.this.ceiling(element);
         }
 
         @Override
-        public E ceiling(E e) {
-            return TreapSet.this.floor(e);
+        public E ceiling(E element) {
+            return TreapSet.this.floor(element);
         }
     }
 }

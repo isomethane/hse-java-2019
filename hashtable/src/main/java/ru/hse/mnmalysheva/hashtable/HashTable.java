@@ -1,6 +1,7 @@
 package ru.hse.mnmalysheva.hashtable;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** Chained hash table with string keys and values */
 public class HashTable {
@@ -25,7 +26,7 @@ public class HashTable {
     /** Get value from table.
      * @return value if table contains key, null otherwise.
      */
-    public String get(@NotNull String key) {
+    public @Nullable String get(@NotNull String key) {
         for (var entry : table[getHash(key)]) {
             if (entry.key.equals(key)) {
                 return entry.value;
@@ -37,7 +38,7 @@ public class HashTable {
     /** Put key to table.
      * @return removed value if table contained key, null otherwise.
      */
-    public String put(@NotNull String key, @NotNull String value) {
+    public @Nullable String put(@NotNull String key, @NotNull String value) {
         var list = table[getHash(key)];
         Entry previousEntry = null;
         String previousValue = null;
@@ -61,7 +62,7 @@ public class HashTable {
     /** Remove key from table.
      * @return removed value if table contained key, null otherwise.
      */
-    public String remove(@NotNull String key) {
+    public @Nullable String remove(@NotNull String key) {
         String removedValue = null;
         for (var iterator = table[getHash(key)].iterator(); iterator.hasNext(); ) {
             var entry = iterator.next();

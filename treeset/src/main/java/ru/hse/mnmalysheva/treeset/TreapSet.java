@@ -75,13 +75,13 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@link TreeSet#iterator()} **/
     @Override
     public @NotNull Iterator<E> iterator() {
-        return new TreeIterator(firstNode(root));
+        return new TreeIterator(false);
     }
 
     /** {@inheritDoc} */
     @Override
     public @NotNull Iterator<E> descendingIterator() {
-        return new DescendingTreeIterator(lastNode(root));
+        return new TreeIterator(true);
     }
 
     /** {@inheritDoc} */
@@ -299,12 +299,14 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     private class TreeIterator implements Iterator<E> {
         private int treeVersion;
+        private boolean isDescending;
         private Node previous;
         private Node next;
         private boolean canRemove;
 
-        private TreeIterator(Node next) {
-            this.next = next;
+        private TreeIterator(boolean isDescending) {
+            this.isDescending = isDescending;
+            next = isDescending ? lastNode(root) : firstNode(root);
             treeVersion = version;
         }
 
@@ -350,25 +352,10 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             }
         }
 
-        protected Node getNext(Node node) {
-            return nextNode(node);
-        }
-
         private void goNext() {
             previous = next;
-            next = getNext(next);
+            next = isDescending ? previousNode(next) : nextNode(next);
             canRemove = true;
-        }
-    }
-
-    private class DescendingTreeIterator extends TreeIterator implements Iterator<E> {
-        private DescendingTreeIterator(Node next) {
-            super(next);
-        }
-
-        @Override
-        protected Node getNext(Node node) {
-            return previousNode(node);
         }
     }
 

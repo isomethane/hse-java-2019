@@ -1,4 +1,4 @@
-package ru.hse.mnmalysheva;
+package ru.hse.mnmalysheva.treeset;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;

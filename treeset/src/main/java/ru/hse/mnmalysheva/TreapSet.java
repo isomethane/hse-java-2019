@@ -9,7 +9,7 @@ import java.util.*;
 public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     private static Random random = new Random(30);
 
-    private int treeVersion;
+    private int version;
     private Node nullNode = new Node();
     private Node root = nullNode;
     private MyTreeSet<E> descendingSet = new DescendingSet();
@@ -26,7 +26,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@link TreeSet#size()} **/
     @Override
     public int size() {
-        return root.size;
+        return root.subtreeSize;
     }
 
     /** {@link TreeSet#isEmpty()} **/
@@ -39,13 +39,13 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     @Override
     public void clear() {
         root = nullNode;
-        treeVersion++;
+        version++;
     }
 
     /** {@link TreeSet#contains(Object)} **/
     @Override
     public boolean contains(@Nullable Object element) {
-        return !isEmpty() && compare(element, find(element).data) == 0;
+        return !isEmpty() && compare(element, descentTo(element).data) == 0;
     }
 
     /** {@link TreeSet#add(Object)} **/
@@ -56,14 +56,14 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
         NodePair splited = split(root, element);
         root = merge(merge(splited.left, new Node(element)), splited.right);
-        treeVersion++;
+        version++;
         return true;
     }
 
     /** {@link TreeSet#remove(Object)} **/
     @Override
     public boolean remove(@Nullable Object element) {
-        var node = find(element);
+        var node = descentTo(element);
         if (root == nullNode || compare(element, node.data) != 0) {
             return false;
         }
@@ -74,7 +74,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             NodePair splited = split(root, node.data);
             root = merge(splited.left, split(splited.right, nextNode.data).right);
         }
-        treeVersion++;
+        version++;
         return true;
     }
 
@@ -117,7 +117,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E lower(@Nullable E element) {
-        var node = find(element);
+        var node = descentTo(element);
         if (node == nullNode || compare(node.data, element) < 0) {
             return node.data;
         }
@@ -127,7 +127,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E higher(@Nullable E element) {
-        var node = find(element);
+        var node = descentTo(element);
         if (node == nullNode || compare(node.data, element) > 0) {
             return node.data;
         }
@@ -137,7 +137,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E floor(@Nullable E element) {
-        var node = find(element);
+        var node = descentTo(element);
         if (node == nullNode || compare(node.data, element) <= 0) {
             return node.data;
         }
@@ -147,7 +147,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E ceiling(@Nullable E element) {
-        var node = find(element);
+        var node = descentTo(element);
         if (node == nullNode || compare(node.data, element) >= 0) {
             return node.data;
         }
@@ -182,18 +182,18 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return right;
     }
 
-    private Node find(Node root, Object element) {
+    private Node descentTo(Node root, Object element) {
         if (compare(root.data, element) < 0) {
-            return root.right == nullNode ? root : find(root.right, element);
+            return root.right == nullNode ? root : descentTo(root.right, element);
         }
         if (compare(root.data, element) > 0) {
-            return root.left == nullNode ? root : find(root.left, element);
+            return root.left == nullNode ? root : descentTo(root.left, element);
         }
         return root;
     }
 
-    private Node find(Object element) {
-        return root == nullNode ? nullNode : find(root, element);
+    private Node descentTo(Object element) {
+        return root == nullNode ? nullNode : descentTo(root, element);
     }
 
     private Node firstNode(Node root) {
@@ -246,7 +246,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         private Node parent;
         private E data;
         private int priority;
-        private int size;
+        private int subtreeSize;
 
         // null node constructor
         private Node() {
@@ -256,7 +256,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         private Node(E data) {
-            size = 1;
+            subtreeSize = 1;
             this.data = data;
             left = nullNode;
             right = nullNode;
@@ -269,7 +269,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                 left.parent = this;
             }
             this.left = left;
-            size = left.size + right.size + 1;
+            subtreeSize = left.subtreeSize + right.subtreeSize + 1;
         }
 
         private void setRight(Node right) {
@@ -277,7 +277,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                 right.parent = this;
             }
             this.right = right;
-            size = left.size + right.size + 1;
+            subtreeSize = left.subtreeSize + right.subtreeSize + 1;
         }
     }
 
@@ -305,15 +305,15 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
     private class TreeIterator implements Iterator<E> {
         protected Node next;
-        private final int version;
+        private final int treeVersion;
 
         private TreeIterator(Node next) {
             this.next = next;
-            version = treeVersion;
+            treeVersion = version;
         }
 
         private void checkState() {
-            if (version != treeVersion) {
+            if (treeVersion != version) {
                 throw new ConcurrentModificationException("Iterator invalidated after modification.");
             }
         }

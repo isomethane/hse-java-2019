@@ -332,4 +332,30 @@ class HashTableTest {
         assertDoesNotThrow(() -> testTable.put("1", "a"));
         assertEquals("a", testTable.remove("1"));
     }
+
+    // resize test
+
+    @Test
+    void resizeDoesNotBreakTable() {
+        for (int i = 0; i < 10000; i++) {
+            assertNull(testTable.put(Integer.toString(i), Integer.toString(i)));
+            assertEquals(i + 1, testTable.size());
+        }
+        for (int i = 0; i < 10000; i++) {
+            assertTrue(testTable.contains(Integer.toString(i)));
+            assertEquals(Integer.toString(i), testTable.get(Integer.toString(i)));
+        }
+        for (int i = 9999; i >= 0; i--) {
+            assertEquals(Integer.toString(i), testTable.remove(Integer.toString(i)));
+            assertEquals(i, testTable.size());
+        }
+        for (int i = 0; i < 10000; i++) {
+            assertNull(testTable.put(Integer.toString(i), Integer.toString(i)));
+            assertEquals(i + 1, testTable.size());
+        }
+        for (int i = 0; i < 10000; i++) {
+            assertTrue(testTable.contains(Integer.toString(i)));
+            assertEquals(Integer.toString(i), testTable.get(Integer.toString(i)));
+        }
+    }
 }

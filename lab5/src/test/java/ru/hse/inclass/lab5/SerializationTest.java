@@ -33,7 +33,8 @@ class SerializationTest {
     }
 
     @Test
-    void test1() throws IOException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    void test1() throws IOException, InvocationTargetException,
+            NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         var temp = new ByteArrayOutputStream();
         var obj1 = new Test1();
 
@@ -42,9 +43,11 @@ class SerializationTest {
         var obj2 = Serialization.deserialize(new ByteArrayInputStream(temp.toByteArray()), Test1.class);
 
         assertEquals(obj1, obj2);
+    }
 
     @Test
-    void deserialize() throws NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException, IOException {
+    void deserialize() throws NoSuchMethodException, IllegalAccessException,
+                InstantiationException, ClassNotFoundException, InvocationTargetException, IOException {
         class TestClass {
             private int testValue = 30;
             private String testString = "aaa";
@@ -70,5 +73,4 @@ class SerializationTest {
         var another = Serialization.deserialize(new ByteArrayInputStream(out.toByteArray()), TestClass.class);
         assertEquals(testClass, another);
     }
-}
 }

@@ -9,13 +9,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class Serialization {
-    void serialize(Object o, OutputStream out) throws IOException {
+    static void serialize(Object o, OutputStream out) throws IOException {
         var clazz = o.getClass();
 
         serialize_by_class(o, o.getClass(), new ObjectOutputStream(out));
     }
 
-    private <T> void serialize_by_class(Object o, Class<T> clazz, ObjectOutputStream out) throws IOException {
+    static private <T> void serialize_by_class(Object o, Class<T> clazz, ObjectOutputStream out)
+                                                                            throws IOException {
         if (clazz == null) {
             return;
         }

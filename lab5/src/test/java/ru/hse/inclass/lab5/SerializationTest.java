@@ -2,8 +2,10 @@ package ru.hse.inclass.lab5;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,13 +33,14 @@ class SerializationTest {
     }
 
     @Test
-    void test1() throws IOException {
+    void test1() throws IOException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         var temp = new ByteArrayOutputStream();
         var obj1 = new Test1();
 
         Serialization.serialize(obj1, temp);
 
-        var obj2 = Serialization.deserialize()
+        var obj2 = Serialization.deserialize(new ByteArrayInputStream(temp.toByteArray()), Test1.class);
 
+        assertEquals(obj1, obj2);
     }
 }

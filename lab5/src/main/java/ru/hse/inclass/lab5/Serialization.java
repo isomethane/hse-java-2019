@@ -10,20 +10,21 @@ public class Serialization {
     static void serialize(Object o, OutputStream out) throws IOException, IllegalAccessException {
         var clazz = o.getClass();
 
-        serialize_by_class(o, o.getClass(), new DataOutputStream(out));
+        serializeByClass(o, o.getClass(), new DataOutputStream(out));
     }
 
-    static private <T> void serialize_by_class(Object o, Class<T> clazz, DataOutputStream out) throws IllegalAccessException, IOException {
+    static private <T> void serializeByClass(Object o, Class<T> clazz, DataOutputStream out) throws IllegalAccessException, IOException {
         if (clazz == null) {
             return;
         }
-        serialize_by_class(o, clazz.getSuperclass(), out);
+        serializeByClass(o, clazz.getSuperclass(), out);
 
         Field[] fields = clazz.getDeclaredFields();
         Arrays.sort(fields, Comparator.comparing(Field::getName));
 
         for (var field : fields) {
             var fieldClass = field.getType();
+            field.setAccessible(true);
 
             if (fieldClass.equals(boolean.class)) {
                 out.writeBoolean(field.getBoolean(o));
@@ -56,6 +57,8 @@ public class Serialization {
         var fields = c.getDeclaredFields();
         Arrays.sort(fields, Comparator.comparing(Field::getName));
         for (var f : fields) {
+            f.setAccessible(true);
+
             if (f.getType().equals(byte.class)) {
                 f.setByte(instance, in.readByte());
             } else if (f.getType().equals(short.class)) {

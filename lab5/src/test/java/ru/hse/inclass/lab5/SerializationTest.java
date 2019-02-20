@@ -11,7 +11,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SerializationTest {
-    private class Test1 {
+    static public class Test1 {
         int a = 3;
         int b = 4;
         char k = 'a';

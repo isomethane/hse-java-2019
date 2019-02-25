@@ -9,13 +9,21 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TreapSetTest {
-    private MyTreeSet<Integer> intSet;
-    private MyTreeSet<Integer> reverseIntSet;
+    private MyTreeSet<Integer> freshSet;
+    private MyTreeSet<Integer> filledSet;
+    private MyTreeSet<Integer> reverseFreshSet;
+    private MyTreeSet<Integer> reverseSet;
+    private List<Integer> testList = Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1);
+    private Integer[] testArray = {1, 2, 4, 6, 9};
 
     @BeforeEach
     void init() {
-        intSet = new TreapSet<>();
-        reverseIntSet = intSet.descendingSet();
+        freshSet = new TreapSet<>();
+        filledSet = new TreapSet<>();
+        filledSet.addAll(testList);
+
+        reverseFreshSet = freshSet.descendingSet();
+        reverseSet = filledSet.descendingSet();
     }
 
     // comparator tests
@@ -35,21 +43,22 @@ class TreapSetTest {
 
     @Test
     void nullsCanBeStoredWithOkComparator() {
-        intSet = new TreapSet<>((a, b) ->
+        var testSet = new TreapSet<Integer>((a, b) ->
                 a == null ?
                         b == null ?
                                 0 :
                                 Integer.compare(0, b) :
                         b == null ?
                                 a.compareTo(0) :
-                                a.compareTo(b));
-        intSet.add(1);
-        intSet.add(3);
-        assertTrue(intSet.add(null));
-        assertFalse(intSet.add(0));
-        intSet.add(-1);
-        intSet.add(2);
-        var it = intSet.iterator();
+                                a.compareTo(b)
+        );
+        testSet.add(1);
+        testSet.add(3);
+        assertTrue(testSet.add(null));
+        assertFalse(testSet.add(0));
+        testSet.add(-1);
+        testSet.add(2);
+        var it = testSet.iterator();
         assertEquals(-1, it.next().intValue());
         assertNull(it.next());
         assertEquals(1, it.next().intValue());
@@ -57,10 +66,10 @@ class TreapSetTest {
         assertEquals(3, it.next().intValue());
         assertFalse(it.hasNext());
 
-        assertTrue(intSet.remove(0));
-        assertTrue(intSet.add(0));
-        assertFalse(intSet.add(null));
-        it = intSet.iterator();
+        assertTrue(testSet.remove(0));
+        assertTrue(testSet.add(0));
+        assertFalse(testSet.add(null));
+        it = testSet.iterator();
         assertEquals(-1, it.next().intValue());
         assertEquals(0, it.next().intValue());
         assertEquals(1, it.next().intValue());
@@ -72,7 +81,7 @@ class TreapSetTest {
     @Test
     void canRemoveOtherTypeThatCanCompareToWithNoComparator() {
         class StrangeInt implements Comparable<StrangeInt> {
-            int value;
+            private int value;
             StrangeInt(int value) { this.value = value; }
             @Override
             public boolean equals(Object o) {
@@ -88,12 +97,12 @@ class TreapSetTest {
             }
         }
         class StrangeIntFoo extends StrangeInt {
-            String foo = "foo";
-            StrangeIntFoo(int value) { super(value); }
+            private String foo = "foo";
+            private StrangeIntFoo(int value) { super(value); }
         }
         class StrangeIntBar extends StrangeInt {
-            String bar = "bar";
-            StrangeIntBar(int value) { super(value); }
+            private String bar = "bar";
+            private StrangeIntBar(int value) { super(value); }
         }
         var strangeIntSet = new TreapSet<StrangeIntFoo>();
         strangeIntSet.add(new StrangeIntFoo(1));
@@ -112,101 +121,133 @@ class TreapSetTest {
 
     @Test
     void emptySetSize() {
-        assertEquals(0, intSet.size());
+        assertEquals(0, freshSet.size());
     }
 
     @Test
     void sizeChangesCorrectlyAfterAdd() {
-        intSet.add(2);
-        assertEquals(1, intSet.size());
-        intSet.add(4);
-        assertEquals(2, intSet.size());
-        intSet.add(4);
-        assertEquals(2, intSet.size());
-        intSet.add(1);
-        assertEquals(3, intSet.size());
-        intSet.add(3);
-        assertEquals(4, intSet.size());
-        intSet.add(5);
-        assertEquals(5, intSet.size());
-        intSet.add(1);
-        assertEquals(5, intSet.size());
+        freshSet.add(2);
+        assertEquals(1, freshSet.size());
+        freshSet.add(4);
+        assertEquals(2, freshSet.size());
+        freshSet.add(4);
+        assertEquals(2, freshSet.size());
+        freshSet.add(1);
+        assertEquals(3, freshSet.size());
+        freshSet.add(3);
+        assertEquals(4, freshSet.size());
+        freshSet.add(5);
+        assertEquals(5, freshSet.size());
+        freshSet.add(1);
+        assertEquals(5, freshSet.size());
     }
 
     @Test
     void sizeChangesCorrectlyAfterRemove() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
+        filledSet.remove(0);
+        assertEquals(5, filledSet.size());
+        filledSet.remove(4);
+        assertEquals(4, filledSet.size());
+        filledSet.remove(4);
+        assertEquals(4, filledSet.size());
+        filledSet.remove(10);
+        assertEquals(4, filledSet.size());
+        filledSet.remove(9);
+        assertEquals(3, filledSet.size());
+        filledSet.remove(1);
+        assertEquals(2, filledSet.size());
+        filledSet.remove(1);
+        assertEquals(2, filledSet.size());
+        filledSet.remove(2);
+        assertEquals(1, filledSet.size());
+        filledSet.remove(6);
+        assertEquals(0, filledSet.size());
+    }
 
-        intSet.remove(0);
-        assertEquals(5, intSet.size());
-        intSet.remove(4);
-        assertEquals(4, intSet.size());
-        intSet.remove(4);
-        assertEquals(4, intSet.size());
-        intSet.remove(10);
-        assertEquals(4, intSet.size());
-        intSet.remove(9);
-        assertEquals(3, intSet.size());
-        intSet.remove(1);
-        assertEquals(2, intSet.size());
-        intSet.remove(1);
-        assertEquals(2, intSet.size());
-        intSet.remove(2);
-        assertEquals(1, intSet.size());
-        intSet.remove(6);
-        assertEquals(0, intSet.size());
+    // clear tests
+
+    @Test
+    void clearWorksCorrectly() {
+        filledSet.clear();
+        assertEquals(0, filledSet.size());
+        assertFalse(filledSet.iterator().hasNext());
+        assertFalse(filledSet.contains(1));
+        assertFalse(filledSet.contains(2));
+        assertFalse(filledSet.contains(4));
+        assertFalse(filledSet.contains(6));
+        assertFalse(filledSet.contains(9));
+    }
+
+    @Test
+    void canUseSetAfterClear() {
+        filledSet.clear();
+        assertDoesNotThrow(() -> filledSet.addAll(testList));
+        assertArrayEquals(testArray, filledSet.toArray());
+    }
+
+    // contains test
+
+    @Test
+    void containsWorksCorrectly() {
+        assertTrue(filledSet.contains(1));
+        assertTrue(filledSet.contains(2));
+        assertTrue(filledSet.contains(4));
+        assertTrue(filledSet.contains(6));
+        assertTrue(filledSet.contains(9));
+        assertFalse(filledSet.contains(0));
+        assertFalse(filledSet.contains(3));
+        assertFalse(filledSet.contains(10));
+        filledSet.remove(2);
+        assertFalse(filledSet.contains(2));
     }
 
     // add tests
 
     @Test
     void addNotExistingReturnsTrue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
+        assertTrue(filledSet.add(0));
+        assertTrue(filledSet.add(3));
+        assertTrue(filledSet.add(10));
+
+        filledSet.remove(4);
+        assertTrue(filledSet.add(4));
     }
 
     @Test
     void addExistingReturnsFalse() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertFalse(intSet.add(1));
-        assertFalse(intSet.add(2));
-        assertFalse(intSet.add(4));
-        assertFalse(intSet.add(6));
-        assertFalse(intSet.add(9));
+        assertFalse(filledSet.add(1));
+        assertFalse(filledSet.add(2));
+        assertFalse(filledSet.add(4));
+        assertFalse(filledSet.add(6));
+        assertFalse(filledSet.add(9));
     }
 
     // remove tests
 
     @Test
     void removeNotExistingReturnsFalse() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
+        assertFalse(filledSet.remove(0));
+        assertFalse(filledSet.remove(3));
+        assertFalse(filledSet.remove(10));
 
-        assertFalse(intSet.remove(0));
-        assertFalse(intSet.remove(3));
-        assertFalse(intSet.remove(10));
-
-        intSet.remove(4);
-        assertFalse(intSet.remove(4));
+        filledSet.remove(4);
+        assertFalse(filledSet.remove(4));
     }
 
     @Test
     void removeExistingReturnsTrue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertTrue(intSet.remove(2));
-        assertTrue(intSet.remove(9));
-        assertTrue(intSet.remove(1));
-        assertTrue(intSet.remove(4));
-        assertTrue(intSet.remove(6));
+        assertTrue(filledSet.remove(2));
+        assertTrue(filledSet.remove(9));
+        assertTrue(filledSet.remove(1));
+        assertTrue(filledSet.remove(4));
+        assertTrue(filledSet.remove(6));
     }
 
     // iterator tests
 
     @Test
     void iteratorNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+        var it = filledSet.iterator();
         assertEquals(Integer.valueOf(1), it.next());
         assertEquals(Integer.valueOf(2), it.next());
         assertEquals(Integer.valueOf(4), it.next());
@@ -216,9 +257,7 @@ class TreapSetTest {
 
     @Test
     void iteratorHasNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+        var it = filledSet.iterator();
         assertTrue(it.hasNext());
         it.next();
         assertTrue(it.hasNext());
@@ -234,9 +273,7 @@ class TreapSetTest {
 
     @Test
     void iteratorNextThrowsNoSuchElementExceptionAfterLastElement() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+        var it = filledSet.iterator();
         it.next();
         it.next();
         it.next();
@@ -246,44 +283,52 @@ class TreapSetTest {
     }
 
     @Test
-    void iteratorNextThrowsConcurrentModificationExceptionAfterModification() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+    void iteratorMethodsThrowConcurrentModificationExceptionAfterModification() {
+        var it = filledSet.iterator();
         it.next();
         it.next();
-        intSet.add(8);
+        filledSet.add(8);
+        assertThrows(ConcurrentModificationException.class, it::hasNext);
         assertThrows(ConcurrentModificationException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::remove);
 
-        it = intSet.iterator();
+        it = filledSet.iterator();
         it.next();
         it.next();
-        intSet.remove(8);
+        filledSet.remove(8);
+        assertThrows(ConcurrentModificationException.class, it::hasNext);
         assertThrows(ConcurrentModificationException.class, it::next);
+        assertThrows(ConcurrentModificationException.class, it::remove);
+
+        it = filledSet.iterator();
+        filledSet.clear();
+        assertThrows(ConcurrentModificationException.class, it::hasNext);
     }
 
     @Test
-    void iteratorNextDoesNotThrowAfterNoModification() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
+    void iteratorMethodsDoNotThrowAfterNoModification() {
+        var it = filledSet.iterator();
+        it.next();
+        it.next();
+        filledSet.add(4);
+        assertDoesNotThrow(it::hasNext);
+        assertDoesNotThrow(it::next);
 
-        var it = intSet.iterator();
+        it = filledSet.iterator();
         it.next();
         it.next();
-        intSet.add(4);
-        it.next();
+        filledSet.remove(3);
+        assertDoesNotThrow(it::hasNext);
+        assertDoesNotThrow(it::next);
 
-        it = intSet.iterator();
-        it.next();
-        it.next();
-        intSet.remove(3);
-        it.next();
+        it = freshSet.iterator();
+        freshSet.clear();
+        assertDoesNotThrow(it::hasNext);
     }
 
     @Test
-    void iteratorRemoveWorksCorrect() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+    void iteratorRemoveWorksCorrectly() {
+        var it = filledSet.iterator();
         it.next();
         it.remove();
         it.next();
@@ -292,7 +337,7 @@ class TreapSetTest {
         it.next();
         it.next();
         it.remove();
-        it = intSet.iterator();
+        it = filledSet.iterator();
         assertEquals(Integer.valueOf(2), it.next());
         assertEquals(Integer.valueOf(6), it.next());
         assertFalse(it.hasNext());
@@ -300,17 +345,13 @@ class TreapSetTest {
 
     @Test
     void iteratorRemoveBeforeNextThrowsIllegalStateException() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+        var it = filledSet.iterator();
         assertThrows(IllegalStateException.class, it::remove);
     }
 
     @Test
     void iteratorRemoveAfterRemoveThrowsIllegalStateException() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.iterator();
+        var it = filledSet.iterator();
         it.next();
         it.remove();
         assertThrows(IllegalStateException.class, it::remove);
@@ -320,9 +361,7 @@ class TreapSetTest {
 
     @Test
     void descendingIteratorNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.descendingIterator();
+        var it = filledSet.descendingIterator();
         assertEquals(Integer.valueOf(9), it.next());
         assertEquals(Integer.valueOf(6), it.next());
         assertEquals(Integer.valueOf(4), it.next());
@@ -332,9 +371,7 @@ class TreapSetTest {
 
     @Test
     void descendingIteratorHasNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.descendingIterator();
+        var it = filledSet.descendingIterator();
         assertTrue(it.hasNext());
         it.next();
         assertTrue(it.hasNext());
@@ -350,9 +387,7 @@ class TreapSetTest {
 
     @Test
     void descendingIteratorNextThrowsNoSuchElementExceptionAfterLastElement() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.descendingIterator();
+        var it = filledSet.descendingIterator();
         it.next();
         it.next();
         it.next();
@@ -363,18 +398,16 @@ class TreapSetTest {
 
     @Test
     void descendingIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = intSet.descendingIterator();
+        var it = filledSet.descendingIterator();
         it.next();
         it.next();
-        intSet.add(8);
+        filledSet.add(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = intSet.descendingIterator();
+        it = filledSet.descendingIterator();
         it.next();
         it.next();
-        intSet.remove(8);
+        filledSet.remove(8);
         assertThrows(ConcurrentModificationException.class, it::next);
     }
 
@@ -382,169 +415,159 @@ class TreapSetTest {
 
     @Test
     void firstInEmptySetThrowsNoSuchElementException() {
-        assertThrows(NoSuchElementException.class, intSet::first);
+        assertThrows(NoSuchElementException.class, freshSet::first);
     }
 
     @Test
     void firstReturnsCorrectValue() {
-        intSet.add(4);
-        assertEquals(Integer.valueOf(4), intSet.first());
-        intSet.add(6);
-        assertEquals(Integer.valueOf(4), intSet.first());
-        intSet.add(2);
-        assertEquals(Integer.valueOf(2), intSet.first());
-        intSet.add(9);
-        assertEquals(Integer.valueOf(2), intSet.first());
-        intSet.add(1);
-        assertEquals(Integer.valueOf(1), intSet.first());
-        intSet.add(3);
-        assertEquals(Integer.valueOf(1), intSet.first());
-        intSet.add(7);
-        assertEquals(Integer.valueOf(1), intSet.first());
+        freshSet.add(4);
+        assertEquals(Integer.valueOf(4), freshSet.first());
+        freshSet.add(6);
+        assertEquals(Integer.valueOf(4), freshSet.first());
+        freshSet.add(2);
+        assertEquals(Integer.valueOf(2), freshSet.first());
+        freshSet.add(9);
+        assertEquals(Integer.valueOf(2), freshSet.first());
+        freshSet.add(1);
+        assertEquals(Integer.valueOf(1), freshSet.first());
+        freshSet.add(3);
+        assertEquals(Integer.valueOf(1), freshSet.first());
+        freshSet.add(7);
+        assertEquals(Integer.valueOf(1), freshSet.first());
     }
 
     // last tests
 
     @Test
     void lastInEmptySetThrowsNoSuchElementException() {
-        assertThrows(NoSuchElementException.class, intSet::last);
+        assertThrows(NoSuchElementException.class, freshSet::last);
     }
 
     @Test
     void lastReturnsCorrectValue() {
-        intSet.add(4);
-        assertEquals(Integer.valueOf(4), intSet.last());
-        intSet.add(6);
-        assertEquals(Integer.valueOf(6), intSet.last());
-        intSet.add(2);
-        assertEquals(Integer.valueOf(6), intSet.last());
-        intSet.add(9);
-        assertEquals(Integer.valueOf(9), intSet.last());
-        intSet.add(1);
-        assertEquals(Integer.valueOf(9), intSet.last());
-        intSet.add(3);
-        assertEquals(Integer.valueOf(9), intSet.last());
-        intSet.add(7);
-        assertEquals(Integer.valueOf(9), intSet.last());
+        freshSet.add(4);
+        assertEquals(Integer.valueOf(4), freshSet.last());
+        freshSet.add(6);
+        assertEquals(Integer.valueOf(6), freshSet.last());
+        freshSet.add(2);
+        assertEquals(Integer.valueOf(6), freshSet.last());
+        freshSet.add(9);
+        assertEquals(Integer.valueOf(9), freshSet.last());
+        freshSet.add(1);
+        assertEquals(Integer.valueOf(9), freshSet.last());
+        freshSet.add(3);
+        assertEquals(Integer.valueOf(9), freshSet.last());
+        freshSet.add(7);
+        assertEquals(Integer.valueOf(9), freshSet.last());
     }
 
     // lower tests
 
     @Test
     void lowerReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertNull(intSet.lower(0));
-        assertNull(intSet.lower(1));
-        assertEquals(Integer.valueOf(1), intSet.lower(2));
-        assertEquals(Integer.valueOf(2), intSet.lower(3));
-        assertEquals(Integer.valueOf(2), intSet.lower(4));
-        assertEquals(Integer.valueOf(4), intSet.lower(5));
-        assertEquals(Integer.valueOf(4), intSet.lower(6));
-        assertEquals(Integer.valueOf(6), intSet.lower(7));
-        assertEquals(Integer.valueOf(6), intSet.lower(8));
-        assertEquals(Integer.valueOf(6), intSet.lower(9));
-        assertEquals(Integer.valueOf(9), intSet.lower(10));
+        assertNull(filledSet.lower(0));
+        assertNull(filledSet.lower(1));
+        assertEquals(Integer.valueOf(1), filledSet.lower(2));
+        assertEquals(Integer.valueOf(2), filledSet.lower(3));
+        assertEquals(Integer.valueOf(2), filledSet.lower(4));
+        assertEquals(Integer.valueOf(4), filledSet.lower(5));
+        assertEquals(Integer.valueOf(4), filledSet.lower(6));
+        assertEquals(Integer.valueOf(6), filledSet.lower(7));
+        assertEquals(Integer.valueOf(6), filledSet.lower(8));
+        assertEquals(Integer.valueOf(6), filledSet.lower(9));
+        assertEquals(Integer.valueOf(9), filledSet.lower(10));
     }
 
     // higher tests
 
     @Test
     void higherReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertEquals(Integer.valueOf(1), intSet.higher(0));
-        assertEquals(Integer.valueOf(2), intSet.higher(1));
-        assertEquals(Integer.valueOf(4), intSet.higher(2));
-        assertEquals(Integer.valueOf(4), intSet.higher(3));
-        assertEquals(Integer.valueOf(6), intSet.higher(4));
-        assertEquals(Integer.valueOf(6), intSet.higher(5));
-        assertEquals(Integer.valueOf(9), intSet.higher(6));
-        assertEquals(Integer.valueOf(9), intSet.higher(7));
-        assertEquals(Integer.valueOf(9), intSet.higher(8));
-        assertNull(intSet.higher(9));
-        assertNull(intSet.higher(10));
+        assertEquals(Integer.valueOf(1), filledSet.higher(0));
+        assertEquals(Integer.valueOf(2), filledSet.higher(1));
+        assertEquals(Integer.valueOf(4), filledSet.higher(2));
+        assertEquals(Integer.valueOf(4), filledSet.higher(3));
+        assertEquals(Integer.valueOf(6), filledSet.higher(4));
+        assertEquals(Integer.valueOf(6), filledSet.higher(5));
+        assertEquals(Integer.valueOf(9), filledSet.higher(6));
+        assertEquals(Integer.valueOf(9), filledSet.higher(7));
+        assertEquals(Integer.valueOf(9), filledSet.higher(8));
+        assertNull(filledSet.higher(9));
+        assertNull(filledSet.higher(10));
     }
 
     // floor tests
 
     @Test
     void floorReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertNull(intSet.floor(0));
-        assertEquals(Integer.valueOf(1), intSet.floor(1));
-        assertEquals(Integer.valueOf(2), intSet.floor(2));
-        assertEquals(Integer.valueOf(2), intSet.floor(3));
-        assertEquals(Integer.valueOf(4), intSet.floor(4));
-        assertEquals(Integer.valueOf(4), intSet.floor(5));
-        assertEquals(Integer.valueOf(6), intSet.floor(6));
-        assertEquals(Integer.valueOf(6), intSet.floor(7));
-        assertEquals(Integer.valueOf(6), intSet.floor(8));
-        assertEquals(Integer.valueOf(9), intSet.floor(9));
-        assertEquals(Integer.valueOf(9), intSet.floor(10));
+        assertNull(filledSet.floor(0));
+        assertEquals(Integer.valueOf(1), filledSet.floor(1));
+        assertEquals(Integer.valueOf(2), filledSet.floor(2));
+        assertEquals(Integer.valueOf(2), filledSet.floor(3));
+        assertEquals(Integer.valueOf(4), filledSet.floor(4));
+        assertEquals(Integer.valueOf(4), filledSet.floor(5));
+        assertEquals(Integer.valueOf(6), filledSet.floor(6));
+        assertEquals(Integer.valueOf(6), filledSet.floor(7));
+        assertEquals(Integer.valueOf(6), filledSet.floor(8));
+        assertEquals(Integer.valueOf(9), filledSet.floor(9));
+        assertEquals(Integer.valueOf(9), filledSet.floor(10));
     }
 
     // ceiling tests
 
     @Test
     void ceilingReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        assertEquals(Integer.valueOf(1), intSet.ceiling(0));
-        assertEquals(Integer.valueOf(1), intSet.ceiling(1));
-        assertEquals(Integer.valueOf(2), intSet.ceiling(2));
-        assertEquals(Integer.valueOf(4), intSet.ceiling(3));
-        assertEquals(Integer.valueOf(4), intSet.ceiling(4));
-        assertEquals(Integer.valueOf(6), intSet.ceiling(5));
-        assertEquals(Integer.valueOf(6), intSet.ceiling(6));
-        assertEquals(Integer.valueOf(9), intSet.ceiling(7));
-        assertEquals(Integer.valueOf(9), intSet.ceiling(8));
-        assertEquals(Integer.valueOf(9), intSet.ceiling(9));
-        assertNull(intSet.ceiling(10));
+        assertEquals(Integer.valueOf(1), filledSet.ceiling(0));
+        assertEquals(Integer.valueOf(1), filledSet.ceiling(1));
+        assertEquals(Integer.valueOf(2), filledSet.ceiling(2));
+        assertEquals(Integer.valueOf(4), filledSet.ceiling(3));
+        assertEquals(Integer.valueOf(4), filledSet.ceiling(4));
+        assertEquals(Integer.valueOf(6), filledSet.ceiling(5));
+        assertEquals(Integer.valueOf(6), filledSet.ceiling(6));
+        assertEquals(Integer.valueOf(9), filledSet.ceiling(7));
+        assertEquals(Integer.valueOf(9), filledSet.ceiling(8));
+        assertEquals(Integer.valueOf(9), filledSet.ceiling(9));
+        assertNull(filledSet.ceiling(10));
     }
 
     // descending set tests
 
     @Test
     void setAndDescendingSetAreBackedUpByEachOther() {
-        intSet.add(4);
-        intSet.add(2);
-        var descendingIntSet = intSet.descendingSet();
-        assert(intSet.size() == 2 && descendingIntSet.size() == intSet.size());
-        descendingIntSet.add(1);
-        assert(intSet.size() == 3 && descendingIntSet.size() == intSet.size());
-        descendingIntSet.add(3);
-        assert(intSet.size() == 4 && descendingIntSet.size() == intSet.size());
-        intSet.add(0);
-        assert(intSet.size() == 5 && descendingIntSet.size() == intSet.size());
-        intSet.add(5);
-        assert(intSet.size() == 6 && descendingIntSet.size() == intSet.size());
-        assertTrue(intSet.contains(1));
-        assertTrue(intSet.contains(3));
-        assertTrue(descendingIntSet.contains(0));
-        assertTrue(descendingIntSet.contains(2));
-        assertTrue(descendingIntSet.contains(4));
-        assertTrue(descendingIntSet.contains(5));
+        freshSet.add(4);
+        freshSet.add(2);
+        reverseFreshSet = freshSet.descendingSet();
+        assertTrue(freshSet.size() == 2 && reverseFreshSet.size() == freshSet.size());
+        reverseFreshSet.add(1);
+        assertTrue(freshSet.size() == 3 && reverseFreshSet.size() == freshSet.size());
+        reverseFreshSet.add(3);
+        assertTrue(freshSet.size() == 4 && reverseFreshSet.size() == freshSet.size());
+        freshSet.add(0);
+        assertTrue(freshSet.size() == 5 && reverseFreshSet.size() == freshSet.size());
+        freshSet.add(5);
+        assertTrue(freshSet.size() == 6 && reverseFreshSet.size() == freshSet.size());
+        assertTrue(freshSet.contains(1));
+        assertTrue(freshSet.contains(3));
+        assertTrue(reverseFreshSet.contains(0));
+        assertTrue(reverseFreshSet.contains(2));
+        assertTrue(reverseFreshSet.contains(4));
+        assertTrue(reverseFreshSet.contains(5));
 
-        intSet.remove(3);
-        assert(intSet.size() == 5 && descendingIntSet.size() == intSet.size());
-        descendingIntSet.remove(4);
-        assert(intSet.size() == 4 && descendingIntSet.size() == intSet.size());
-        assertFalse(descendingIntSet.contains(3));
-        assertFalse(intSet.contains(4));
+        freshSet.remove(3);
+        assertTrue(freshSet.size() == 5 && reverseFreshSet.size() == freshSet.size());
+        reverseFreshSet.remove(4);
+        assertTrue(freshSet.size() == 4 && reverseFreshSet.size() == freshSet.size());
+        assertFalse(reverseFreshSet.contains(3));
+        assertFalse(freshSet.contains(4));
 
-        intSet.clear();
-        assertTrue(descendingIntSet.isEmpty());
+        freshSet.clear();
+        assertTrue(reverseFreshSet.isEmpty());
     }
 
     // descending set iterator tests
 
     @Test
     void descendingSetIteratorNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.iterator();
+        var it = reverseSet.iterator();
         assertEquals(Integer.valueOf(9), it.next());
         assertEquals(Integer.valueOf(6), it.next());
         assertEquals(Integer.valueOf(4), it.next());
@@ -554,9 +577,7 @@ class TreapSetTest {
 
     @Test
     void descendingSetIteratorHasNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.iterator();
+        var it = reverseSet.iterator();
         assertTrue(it.hasNext());
         it.next();
         assertTrue(it.hasNext());
@@ -572,9 +593,7 @@ class TreapSetTest {
 
     @Test
     void descendingSetIteratorNextThrowsNoSuchElementExceptionAfterLastElement() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.iterator();
+        var it = reverseSet.iterator();
         it.next();
         it.next();
         it.next();
@@ -585,69 +604,63 @@ class TreapSetTest {
 
     @Test
     void descendingSetIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.iterator();
+        var it = reverseSet.iterator();
         it.next();
         it.next();
-        reverseIntSet.add(8);
+        reverseSet.add(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        reverseIntSet.remove(8);
+        reverseSet.remove(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        intSet.add(8);
+        filledSet.add(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        intSet.remove(8);
+        filledSet.remove(8);
         assertThrows(ConcurrentModificationException.class, it::next);
     }
 
     @Test
     void descendingSetIteratorNextDoesNotThrowAfterNoModification() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
+        var it = reverseSet.iterator();
+        it.next();
+        it.next();
+        reverseSet.add(4);
+        assertDoesNotThrow(it::next);
 
-        var it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        reverseIntSet.add(4);
-        it.next();
+        reverseSet.remove(3);
+        assertDoesNotThrow(it::next);
 
-        it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        reverseIntSet.remove(8);
-        it.next();
+        filledSet.add(4);
+        assertDoesNotThrow(it::next);
 
-        it = reverseIntSet.iterator();
+        it = reverseSet.iterator();
         it.next();
         it.next();
-        intSet.add(4);
-        it.next();
-
-        it = reverseIntSet.iterator();
-        it.next();
-        it.next();
-        intSet.remove(8);
-        it.next();
+        filledSet.remove(3);
+        assertDoesNotThrow(it::next);
     }
 
     // descending set descending iterator tests
 
     @Test
     void descendingSetDescendingIteratorNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.descendingIterator();
+        var it = reverseSet.descendingIterator();
         assertEquals(Integer.valueOf(1), it.next());
         assertEquals(Integer.valueOf(2), it.next());
         assertEquals(Integer.valueOf(4), it.next());
@@ -657,9 +670,7 @@ class TreapSetTest {
 
     @Test
     void descendingSetDescendingIteratorHasNextReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-
-        var it = reverseIntSet.descendingIterator();
+        var it = reverseSet.descendingIterator();
         assertTrue(it.hasNext());
         it.next();
         assertTrue(it.hasNext());
@@ -675,8 +686,9 @@ class TreapSetTest {
 
     @Test
     void descendingSetDescendingIteratorNextThrowsNoSuchElementExceptionAfterLastElement() {
-        reverseIntSet.addAll(Arrays.asList(4, 1, 3));
-        var it = reverseIntSet.descendingIterator();
+        var it = reverseSet.descendingIterator();
+        it.next();
+        it.next();
         it.next();
         it.next();
         it.next();
@@ -685,24 +697,22 @@ class TreapSetTest {
 
     @Test
     void descendingSetDescendingIteratorNextThrowsConcurrentModificationExceptionAfterModification() {
-        reverseIntSet.addAll(Arrays.asList(4, 1, 3));
-
-        var it = reverseIntSet.descendingIterator();
+        var it = reverseSet.descendingIterator();
         it.next();
         it.next();
-        reverseIntSet.add(6);
+        reverseSet.add(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = reverseIntSet.descendingIterator();
+        it = reverseSet.descendingIterator();
         it.next();
         it.next();
-        reverseIntSet.remove(6);
+        reverseSet.remove(8);
         assertThrows(ConcurrentModificationException.class, it::next);
 
-        it = reverseIntSet.descendingIterator();
+        it = reverseSet.descendingIterator();
         it.next();
         it.next();
-        reverseIntSet.clear();
+        reverseSet.clear();
         assertThrows(ConcurrentModificationException.class, it::next);
     }
 
@@ -710,130 +720,124 @@ class TreapSetTest {
 
     @Test
     void descendingSetFirstInEmptySetThrowsNoSuchElementException() {
-        assertThrows(NoSuchElementException.class, reverseIntSet::first);
+        assertThrows(NoSuchElementException.class, reverseFreshSet::first);
     }
 
     @Test
     void descendingSetFirstReturnsCorrectValue() {
-        reverseIntSet.add(4);
-        assertEquals(Integer.valueOf(4), reverseIntSet.first());
-        reverseIntSet.add(6);
-        assertEquals(Integer.valueOf(6), reverseIntSet.first());
-        reverseIntSet.add(2);
-        assertEquals(Integer.valueOf(6), reverseIntSet.first());
-        reverseIntSet.add(9);
-        assertEquals(Integer.valueOf(9), reverseIntSet.first());
-        reverseIntSet.add(1);
-        assertEquals(Integer.valueOf(9), reverseIntSet.first());
-        reverseIntSet.add(3);
-        assertEquals(Integer.valueOf(9), reverseIntSet.first());
-        reverseIntSet.add(7);
-        assertEquals(Integer.valueOf(9), reverseIntSet.first());
+        reverseFreshSet.add(4);
+        assertEquals(Integer.valueOf(4), reverseFreshSet.first());
+        reverseFreshSet.add(6);
+        assertEquals(Integer.valueOf(6), reverseFreshSet.first());
+        reverseFreshSet.add(2);
+        assertEquals(Integer.valueOf(6), reverseFreshSet.first());
+        reverseFreshSet.add(9);
+        assertEquals(Integer.valueOf(9), reverseFreshSet.first());
+        reverseFreshSet.add(1);
+        assertEquals(Integer.valueOf(9), reverseFreshSet.first());
+        reverseFreshSet.add(3);
+        assertEquals(Integer.valueOf(9), reverseFreshSet.first());
+        reverseFreshSet.add(7);
+        assertEquals(Integer.valueOf(9), reverseFreshSet.first());
     }
 
     // descending set last tests
 
     @Test
     void descendingSetLastInEmptySetThrowsNoSuchElementException() {
-        assertThrows(NoSuchElementException.class, reverseIntSet::last);
+        assertThrows(NoSuchElementException.class, reverseFreshSet::last);
     }
 
     @Test
     void descendingSetLastReturnsCorrectValue() {
-        reverseIntSet.add(4);
-        assertEquals(Integer.valueOf(4), reverseIntSet.last());
-        reverseIntSet.add(6);
-        assertEquals(Integer.valueOf(4), reverseIntSet.last());
-        reverseIntSet.add(2);
-        assertEquals(Integer.valueOf(2), reverseIntSet.last());
-        reverseIntSet.add(9);
-        assertEquals(Integer.valueOf(2), reverseIntSet.last());
-        reverseIntSet.add(1);
-        assertEquals(Integer.valueOf(1), reverseIntSet.last());
-        reverseIntSet.add(3);
-        assertEquals(Integer.valueOf(1), reverseIntSet.last());
-        reverseIntSet.add(7);
-        assertEquals(Integer.valueOf(1), reverseIntSet.last());
+        reverseFreshSet.add(4);
+        assertEquals(Integer.valueOf(4), reverseFreshSet.last());
+        reverseFreshSet.add(6);
+        assertEquals(Integer.valueOf(4), reverseFreshSet.last());
+        reverseFreshSet.add(2);
+        assertEquals(Integer.valueOf(2), reverseFreshSet.last());
+        reverseFreshSet.add(9);
+        assertEquals(Integer.valueOf(2), reverseFreshSet.last());
+        reverseFreshSet.add(1);
+        assertEquals(Integer.valueOf(1), reverseFreshSet.last());
+        reverseFreshSet.add(3);
+        assertEquals(Integer.valueOf(1), reverseFreshSet.last());
+        reverseFreshSet.add(7);
+        assertEquals(Integer.valueOf(1), reverseFreshSet.last());
     }
 
     // descending set higher tests
 
     @Test
     void descendingSetHigherReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-        assertNull(reverseIntSet.higher(0));
-        assertNull(reverseIntSet.higher(1));
-        assertEquals(Integer.valueOf(1), reverseIntSet.higher(2));
-        assertEquals(Integer.valueOf(2), reverseIntSet.higher(3));
-        assertEquals(Integer.valueOf(2), reverseIntSet.higher(4));
-        assertEquals(Integer.valueOf(4), reverseIntSet.higher(5));
-        assertEquals(Integer.valueOf(4), reverseIntSet.higher(6));
-        assertEquals(Integer.valueOf(6), reverseIntSet.higher(7));
-        assertEquals(Integer.valueOf(6), reverseIntSet.higher(8));
-        assertEquals(Integer.valueOf(6), reverseIntSet.higher(9));
-        assertEquals(Integer.valueOf(9), reverseIntSet.higher(10));
+        assertNull(reverseSet.higher(0));
+        assertNull(reverseSet.higher(1));
+        assertEquals(Integer.valueOf(1), reverseSet.higher(2));
+        assertEquals(Integer.valueOf(2), reverseSet.higher(3));
+        assertEquals(Integer.valueOf(2), reverseSet.higher(4));
+        assertEquals(Integer.valueOf(4), reverseSet.higher(5));
+        assertEquals(Integer.valueOf(4), reverseSet.higher(6));
+        assertEquals(Integer.valueOf(6), reverseSet.higher(7));
+        assertEquals(Integer.valueOf(6), reverseSet.higher(8));
+        assertEquals(Integer.valueOf(6), reverseSet.higher(9));
+        assertEquals(Integer.valueOf(9), reverseSet.higher(10));
     }
 
     // descending set lower tests
 
     @Test
     void descendingSetLowerReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-        assertEquals(Integer.valueOf(1), reverseIntSet.lower(0));
-        assertEquals(Integer.valueOf(2), reverseIntSet.lower(1));
-        assertEquals(Integer.valueOf(4), reverseIntSet.lower(2));
-        assertEquals(Integer.valueOf(4), reverseIntSet.lower(3));
-        assertEquals(Integer.valueOf(6), reverseIntSet.lower(4));
-        assertEquals(Integer.valueOf(6), reverseIntSet.lower(5));
-        assertEquals(Integer.valueOf(9), reverseIntSet.lower(6));
-        assertEquals(Integer.valueOf(9), reverseIntSet.lower(7));
-        assertEquals(Integer.valueOf(9), reverseIntSet.lower(8));
-        assertNull(reverseIntSet.lower(9));
-        assertNull(reverseIntSet.lower(10));
+        assertEquals(Integer.valueOf(1), reverseSet.lower(0));
+        assertEquals(Integer.valueOf(2), reverseSet.lower(1));
+        assertEquals(Integer.valueOf(4), reverseSet.lower(2));
+        assertEquals(Integer.valueOf(4), reverseSet.lower(3));
+        assertEquals(Integer.valueOf(6), reverseSet.lower(4));
+        assertEquals(Integer.valueOf(6), reverseSet.lower(5));
+        assertEquals(Integer.valueOf(9), reverseSet.lower(6));
+        assertEquals(Integer.valueOf(9), reverseSet.lower(7));
+        assertEquals(Integer.valueOf(9), reverseSet.lower(8));
+        assertNull(reverseSet.lower(9));
+        assertNull(reverseSet.lower(10));
     }
 
     // descending set ceiling tests
 
     @Test
     void descendingSetCeilingReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-        assertNull(reverseIntSet.ceiling(0));
-        assertEquals(Integer.valueOf(1), reverseIntSet.ceiling(1));
-        assertEquals(Integer.valueOf(2), reverseIntSet.ceiling(2));
-        assertEquals(Integer.valueOf(2), reverseIntSet.ceiling(3));
-        assertEquals(Integer.valueOf(4), reverseIntSet.ceiling(4));
-        assertEquals(Integer.valueOf(4), reverseIntSet.ceiling(5));
-        assertEquals(Integer.valueOf(6), reverseIntSet.ceiling(6));
-        assertEquals(Integer.valueOf(6), reverseIntSet.ceiling(7));
-        assertEquals(Integer.valueOf(6), reverseIntSet.ceiling(8));
-        assertEquals(Integer.valueOf(9), reverseIntSet.ceiling(9));
-        assertEquals(Integer.valueOf(9), reverseIntSet.ceiling(10));
+        assertNull(reverseSet.ceiling(0));
+        assertEquals(Integer.valueOf(1), reverseSet.ceiling(1));
+        assertEquals(Integer.valueOf(2), reverseSet.ceiling(2));
+        assertEquals(Integer.valueOf(2), reverseSet.ceiling(3));
+        assertEquals(Integer.valueOf(4), reverseSet.ceiling(4));
+        assertEquals(Integer.valueOf(4), reverseSet.ceiling(5));
+        assertEquals(Integer.valueOf(6), reverseSet.ceiling(6));
+        assertEquals(Integer.valueOf(6), reverseSet.ceiling(7));
+        assertEquals(Integer.valueOf(6), reverseSet.ceiling(8));
+        assertEquals(Integer.valueOf(9), reverseSet.ceiling(9));
+        assertEquals(Integer.valueOf(9), reverseSet.ceiling(10));
     }
 
     // descending set floor tests
 
     @Test
     void descendingSetFloorReturnsCorrectValue() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-        assertEquals(Integer.valueOf(1), reverseIntSet.floor(0));
-        assertEquals(Integer.valueOf(1), reverseIntSet.floor(1));
-        assertEquals(Integer.valueOf(2), reverseIntSet.floor(2));
-        assertEquals(Integer.valueOf(4), reverseIntSet.floor(3));
-        assertEquals(Integer.valueOf(4), reverseIntSet.floor(4));
-        assertEquals(Integer.valueOf(6), reverseIntSet.floor(5));
-        assertEquals(Integer.valueOf(6), reverseIntSet.floor(6));
-        assertEquals(Integer.valueOf(9), reverseIntSet.floor(7));
-        assertEquals(Integer.valueOf(9), reverseIntSet.floor(8));
-        assertEquals(Integer.valueOf(9), reverseIntSet.floor(9));
-        assertNull(reverseIntSet.floor(10));
+        assertEquals(Integer.valueOf(1), reverseSet.floor(0));
+        assertEquals(Integer.valueOf(1), reverseSet.floor(1));
+        assertEquals(Integer.valueOf(2), reverseSet.floor(2));
+        assertEquals(Integer.valueOf(4), reverseSet.floor(3));
+        assertEquals(Integer.valueOf(4), reverseSet.floor(4));
+        assertEquals(Integer.valueOf(6), reverseSet.floor(5));
+        assertEquals(Integer.valueOf(6), reverseSet.floor(6));
+        assertEquals(Integer.valueOf(9), reverseSet.floor(7));
+        assertEquals(Integer.valueOf(9), reverseSet.floor(8));
+        assertEquals(Integer.valueOf(9), reverseSet.floor(9));
+        assertNull(reverseSet.floor(10));
     }
 
     // descending set descending set tests
 
     @Test
     void descendingSetDescendingSetReturnsOriginalSet() {
-        intSet.addAll(Arrays.asList(4, 6, 2, 2, 9, 1, 6, 1)); // 1 2 4 6 9
-        var it = reverseIntSet.descendingSet().iterator();
-        assertArrayEquals(intSet.toArray(), reverseIntSet.descendingSet().toArray());
+        assertArrayEquals(filledSet.toArray(), reverseSet.descendingSet().toArray());
     }
 }

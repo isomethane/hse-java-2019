@@ -81,13 +81,13 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@link TreeSet#iterator()} **/
     @Override
     public @NotNull Iterator<E> iterator() {
-        return new TreeIterator(false);
+        return new TreeIterator(Order.ASCENDING);
     }
 
     /** {@inheritDoc} */
     @Override
     public @NotNull Iterator<E> descendingIterator() {
-        return new TreeIterator(true);
+        return new TreeIterator(Order.DESCENDING);
     }
 
     /** {@inheritDoc} */
@@ -298,16 +298,18 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
     }
 
+    private enum Order { ASCENDING, DESCENDING }
+
     private class TreeIterator implements Iterator<E> {
         private int treeVersion;
-        private boolean isDescending;
+        private Order order;
         private Node previous;
         private Node next;
         private boolean canRemove;
 
-        private TreeIterator(boolean isDescending) {
-            this.isDescending = isDescending;
-            next = isDescending ? lastNode(root) : firstNode(root);
+        private TreeIterator(Order order) {
+            this.order = order;
+            next = (order == Order.ASCENDING) ? firstNode(root) : lastNode(root);
             treeVersion = version;
         }
 
@@ -355,7 +357,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         private void goNext() {
             previous = next;
-            next = isDescending ? previousNode(next) : nextNode(next);
+            next = (order == Order.ASCENDING) ? nextNode(next) : previousNode(next);
             canRemove = true;
         }
     }

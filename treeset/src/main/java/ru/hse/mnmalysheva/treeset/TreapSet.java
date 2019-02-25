@@ -154,7 +154,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return nextNode(node).data;
     }
 
-    private NodePair split(Node root, E element) {
+    private @NotNull NodePair split(@NotNull Node root, @Nullable E element) {
         if (root == nullNode) {
             return new NodePair(nullNode, nullNode);
         }
@@ -170,7 +170,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return result;
     }
 
-    private Node merge(Node left, Node right) {
+    private @NotNull Node merge(@NotNull Node left, @NotNull Node right) {
         if (left == nullNode || right == nullNode) {
             return left != nullNode ? left : right;
         }
@@ -182,7 +182,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return right;
     }
 
-    private Node descentTo(Node root, Object element) {
+    private @NotNull Node descentTo(@NotNull Node root, @Nullable Object element) {
         if (compare(element, root.data) > 0) {
             return root.right == nullNode ? root : descentTo(root.right, element);
         }
@@ -192,11 +192,11 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return root;
     }
 
-    private Node descentTo(Object element) {
+    private @NotNull Node descentTo(@Nullable Object element) {
         return root == nullNode ? nullNode : descentTo(root, element);
     }
 
-    private Node firstNode(Node root) {
+    private @NotNull Node firstNode(@NotNull Node root) {
         var node = root;
         while (node.left != nullNode) {
             node = node.left;
@@ -204,7 +204,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return node;
     }
 
-    private Node lastNode(Node root) {
+    private @NotNull Node lastNode(@NotNull Node root) {
         var node = root;
         while (node.right != nullNode) {
             node = node.right;
@@ -212,7 +212,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return node;
     }
 
-    private Node previousNode(Node node) {
+    private @NotNull Node previousNode(@NotNull Node node) {
         if (node.left != nullNode) {
             return lastNode(node.left);
         }
@@ -222,7 +222,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return node.parent;
     }
 
-    private Node nextNode(Node node) {
+    private @NotNull Node nextNode(@NotNull Node node) {
         if (node.right != nullNode) {
             return firstNode(node.right);
         }
@@ -233,9 +233,9 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     @SuppressWarnings("unchecked")
-    private int compare(Object first, E second) {
+    private int compare(@Nullable Object first, @Nullable E second) {
         if (comparator == null) {
-            return ((Comparable<? super E>) first).compareTo(second);
+            return ((Comparable<? super E>) Objects.requireNonNull(first)).compareTo(Objects.requireNonNull(second));
         }
         return comparator.compare((E) first, second);
     }
@@ -250,7 +250,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         private Node() {}
 
-        private Node(E data) {
+        private Node(@Nullable E data) {
             subtreeSize = 1;
             this.data = data;
             left = nullNode;
@@ -259,7 +259,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             priority = random.nextInt();
         }
 
-        private void setLeft(Node left) {
+        private void setLeft(@NotNull Node left) {
             if (left != nullNode) {
                 left.parent = this;
             }
@@ -267,7 +267,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             subtreeSize = left.subtreeSize + right.subtreeSize + 1;
         }
 
-        private void setRight(Node right) {
+        private void setRight(@NotNull Node right) {
             if (right != nullNode) {
                 right.parent = this;
             }
@@ -280,19 +280,19 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         private Node left;
         private Node right;
 
-        private NodePair(Node left, Node right) {
+        private NodePair(@NotNull Node left, @NotNull Node right) {
             this.left = left;
             this.right = right;
             left.parent = nullNode;
             right.parent = nullNode;
         }
 
-        private void setLeft(Node left) {
+        private void setLeft(@NotNull Node left) {
             this.left = left;
             left.parent = nullNode;
         }
 
-        private void setRight(Node right) {
+        private void setRight(@NotNull Node right) {
             this.right = right;
             right.parent = nullNode;
         }
@@ -318,7 +318,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        public E next() {
+        public @Nullable E next() {
             checkState();
             if (!hasNext()) {
                 throw new NoSuchElementException("The iteration has no more elements.");
@@ -372,17 +372,17 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        public boolean contains(Object element) {
+        public boolean contains(@Nullable Object element) {
             return TreapSet.this.contains(element);
         }
 
         @Override
-        public boolean add(E element) {
+        public boolean add(@Nullable E element) {
             return TreapSet.this.add(element);
         }
 
         @Override
-        public boolean remove(Object element) {
+        public boolean remove(@Nullable Object element) {
             return TreapSet.this.remove(element);
         }
 
@@ -402,32 +402,32 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
 
         @Override
-        public E first() {
+        public @Nullable E first() {
             return TreapSet.this.last();
         }
 
         @Override
-        public E last() {
+        public @Nullable E last() {
             return TreapSet.this.first();
         }
 
         @Override
-        public E lower(E element) {
+        public @Nullable E lower(@Nullable E element) {
             return TreapSet.this.higher(element);
         }
 
         @Override
-        public E higher(E element) {
+        public @Nullable E higher(@Nullable E element) {
             return TreapSet.this.lower(element);
         }
 
         @Override
-        public E floor(E element) {
+        public @Nullable E floor(@Nullable E element) {
             return TreapSet.this.ceiling(element);
         }
 
         @Override
-        public E ceiling(E element) {
+        public @Nullable E ceiling(@Nullable E element) {
             return TreapSet.this.floor(element);
         }
     }

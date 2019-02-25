@@ -177,10 +177,10 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     private Node descentTo(Node root, Object element) {
-        if (compare(root.data, element) < 0) {
+        if (compare(element, root.data) > 0) {
             return root.right == nullNode ? root : descentTo(root.right, element);
         }
-        if (compare(root.data, element) > 0) {
+        if (compare(element, root.data) < 0) {
             return root.left == nullNode ? root : descentTo(root.left, element);
         }
         return root;
@@ -227,11 +227,11 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     }
 
     @SuppressWarnings("unchecked")
-    private int compare(Object first, Object second) {
+    private int compare(Object first, E second) {
         if (comparator == null) {
-            return ((Comparable) first).compareTo(second);
+            return ((Comparable<? super E>) first).compareTo(second);
         }
-        return comparator.compare((E) first, (E) second);
+        return comparator.compare((E) first, second);
     }
 
     private class Node {

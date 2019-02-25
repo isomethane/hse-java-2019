@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
 /** Cartesian tree based set. */
 public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
@@ -114,25 +114,25 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E lower(@Nullable E element) {
-        return boundingElement(element, c -> c < 0, Step.PREVIOUS);
+        return boundingElement(element, (result, e) -> result < e, Step.PREVIOUS);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E higher(@Nullable E element) {
-        return boundingElement(element, c -> c > 0, Step.NEXT);
+        return boundingElement(element, (result, e) -> result > e, Step.NEXT);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E floor(@Nullable E element) {
-        return boundingElement(element, c -> c <= 0, Step.PREVIOUS);
+        return boundingElement(element, (result, e) -> result <= e, Step.PREVIOUS);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E ceiling(@Nullable E element) {
-        return boundingElement(element, c -> c >= 0, Step.NEXT);
+        return boundingElement(element, (result, e) -> result >= e, Step.NEXT);
     }
 
     private @NotNull NodePair split(@NotNull Node root, @Nullable E element) {
@@ -208,12 +208,14 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return firstNode(root, order).data;
     }
 
-    private @Nullable E boundingElement(@Nullable E element, Predicate<Integer> boundPredicate, Step step) {
+    private @Nullable E boundingElement(@Nullable E element,
+                                        BiPredicate<Integer, Integer> boundPredicate,
+                                        Step stepFromElement) {
         var node = descentTo(element);
-        if (node == nullNode || boundPredicate.test(compare(node.data, element))) {
+        if (node == nullNode || boundPredicate.test(compare(node.data, element), 0)) {
             return node.data;
         }
-        return adjacentNode(node, step).data;
+        return adjacentNode(node, stepFromElement).data;
     }
 
     @SuppressWarnings("unchecked")

@@ -15,6 +15,12 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     private MyTreeSet<E> descendingSet = new DescendingSet();
     private Comparator<? super E> comparator;
 
+    {
+        nullNode.left = nullNode;
+        nullNode.right = nullNode;
+        nullNode.parent = nullNode;
+    }
+
     /** {@link TreeSet#TreeSet()} **/
     public TreapSet() {}
 
@@ -242,12 +248,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         private int priority;
         private int subtreeSize;
 
-        // null node constructor
-        private Node() {
-            left = this;
-            right = this;
-            parent = this;
-        }
+        private Node() {}
 
         private Node(E data) {
             subtreeSize = 1;

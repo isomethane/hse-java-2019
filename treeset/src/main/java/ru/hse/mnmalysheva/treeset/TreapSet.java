@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /** Cartesian tree based set. */
 public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
@@ -63,11 +64,11 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@link TreeSet#remove(Object)} **/
     @Override
     public boolean remove(@Nullable Object element) {
-        var node = descentTo(element);
-        if (root == nullNode || compare(element, node.data) != 0) {
+        if (!contains(element)) {
             return false;
         }
-        var nextNode = nextNode(node);
+        var node = descentTo(element);
+        var nextNode = nextNode(node, Order.ASCENDING);
         if (nextNode == nullNode) {
             root = split(root, node.data).left;
         } else {
@@ -99,59 +100,37 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@inheritDoc} */
     @Override
     public @Nullable E first() {
-        if (root == nullNode) {
-            throw new NoSuchElementException("Set is empty.");
-        }
-        return firstNode(root).data;
+        return firstElement(Order.ASCENDING);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E last() {
-        if (root == nullNode) {
-            throw new NoSuchElementException("Set is empty.");
-        }
-        return lastNode(root).data;
+        return firstElement(Order.DESCENDING);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E lower(@Nullable E element) {
-        var node = descentTo(element);
-        if (node == nullNode || compare(node.data, element) < 0) {
-            return node.data;
-        }
-        return previousNode(node).data;
+        return boundingElement(element, c -> c < 0, Step.PREVIOUS);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E higher(@Nullable E element) {
-        var node = descentTo(element);
-        if (node == nullNode || compare(node.data, element) > 0) {
-            return node.data;
-        }
-        return nextNode(node).data;
+        return boundingElement(element, c -> c > 0, Step.NEXT);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E floor(@Nullable E element) {
-        var node = descentTo(element);
-        if (node == nullNode || compare(node.data, element) <= 0) {
-            return node.data;
-        }
-        return previousNode(node).data;
+        return boundingElement(element, c -> c <= 0, Step.PREVIOUS);
     }
 
     /** {@inheritDoc} */
     @Override
     public @Nullable E ceiling(@Nullable E element) {
-        var node = descentTo(element);
-        if (node == nullNode || compare(node.data, element) >= 0) {
-            return node.data;
-        }
-        return nextNode(node).data;
+        return boundingElement(element, c -> c >= 0, Step.NEXT);
     }
 
     private @NotNull NodePair split(@NotNull Node root, @Nullable E element) {
@@ -196,40 +175,43 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return root == nullNode ? nullNode : descentTo(root, element);
     }
 
-    private @NotNull Node firstNode(@NotNull Node root) {
+    private @NotNull Node firstNode(@NotNull Node root, Order order) {
         var node = root;
-        while (node.left != nullNode) {
-            node = node.left;
+        Node left;
+        while ((left = node.getLeft(order)) != nullNode) {
+            node = left;
         }
         return node;
     }
 
-    private @NotNull Node lastNode(@NotNull Node root) {
-        var node = root;
-        while (node.right != nullNode) {
-            node = node.right;
+    private @NotNull Node nextNode(@NotNull Node node, Order order) {
+        Node right = node.getRight(order);
+        if (right != nullNode) {
+            return firstNode(right, order);
         }
-        return node;
-    }
-
-    private @NotNull Node previousNode(@NotNull Node node) {
-        if (node.left != nullNode) {
-            return lastNode(node.left);
-        }
-        while (node.parent != nullNode && node != node.parent.right) {
+        while (node.parent != nullNode && node != node.parent.getLeft(order)) {
             node = node.parent;
         }
         return node.parent;
     }
 
-    private @NotNull Node nextNode(@NotNull Node node) {
-        if (node.right != nullNode) {
-            return firstNode(node.right);
+    private @NotNull Node adjacentNode(@NotNull Node node, Step step) {
+        return nextNode(node, (step == Step.NEXT) ? Order.ASCENDING : Order.DESCENDING);
+    }
+
+    private @Nullable E firstElement(Order order) {
+        if (root == nullNode) {
+            throw new NoSuchElementException("Set is empty.");
         }
-        while (node.parent != nullNode && node != node.parent.left) {
-            node = node.parent;
+        return firstNode(root, order).data;
+    }
+
+    private @Nullable E boundingElement(@Nullable E element, Predicate<Integer> boundPredicate, Step step) {
+        var node = descentTo(element);
+        if (node == nullNode || boundPredicate.test(compare(node.data, element))) {
+            return node.data;
         }
-        return node.parent;
+        return adjacentNode(node, step).data;
     }
 
     @SuppressWarnings("unchecked")
@@ -239,6 +221,10 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
         return comparator.compare((E) first, second);
     }
+
+    private enum Order { ASCENDING, DESCENDING }
+
+    private enum Step { PREVIOUS, NEXT }
 
     private class Node {
         private Node left;
@@ -257,6 +243,14 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
             right = nullNode;
             parent = nullNode;
             priority = random.nextInt();
+        }
+
+        private @NotNull Node getLeft(Order order) {
+            return (order == Order.ASCENDING) ? left : right;
+        }
+
+        private @NotNull Node getRight(Order order) {
+            return (order == Order.ASCENDING) ? right : left;
         }
 
         private void setLeft(@NotNull Node left) {
@@ -298,8 +292,6 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         }
     }
 
-    private enum Order { ASCENDING, DESCENDING }
-
     private class TreeIterator implements Iterator<E> {
         private int treeVersion;
         private Order order;
@@ -309,7 +301,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         private TreeIterator(Order order) {
             this.order = order;
-            next = (order == Order.ASCENDING) ? firstNode(root) : lastNode(root);
+            next = firstNode(root, order);
             treeVersion = version;
         }
 
@@ -357,7 +349,7 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
 
         private void goNext() {
             previous = next;
-            next = (order == Order.ASCENDING) ? nextNode(next) : previousNode(next);
+            next = nextNode(next, order);
             canRemove = true;
         }
     }

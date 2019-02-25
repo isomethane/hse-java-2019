@@ -39,8 +39,10 @@ public class TreapSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     /** {@link TreeSet#clear()} **/
     @Override
     public void clear() {
-        root = nullNode;
-        version++;
+        if (!isEmpty()) {
+            root = nullNode;
+            version++;
+        }
     }
 
     /** {@link TreeSet#contains(Object)} **/

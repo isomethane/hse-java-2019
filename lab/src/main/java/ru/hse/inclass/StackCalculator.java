@@ -16,6 +16,9 @@ public class StackCalculator {
     private List<Integer> stack;
 
     StackCalculator(List<Integer> stack) {
+        if (stack.size() != 0) {
+            throw new IllegalArgumentException();
+        }
         this.stack = stack;
     }
 
@@ -58,7 +61,9 @@ public class StackCalculator {
         }
 
         if (stack.size() == 1) {
-            return stack.get(0);
+            int result = stack.get(0);
+            stack.remove(0);
+            return result;
         } else {
             throw new IllegalStateException();
         }

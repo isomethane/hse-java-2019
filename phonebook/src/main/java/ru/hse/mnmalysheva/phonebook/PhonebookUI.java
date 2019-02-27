@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Scanner;
 
+/** Console phonebook database UI. **/
 public class PhonebookUI {
     private static final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
     private static final String OPTIONS =
@@ -21,6 +22,18 @@ public class PhonebookUI {
             "*-------------------------------------*\n" +
             "Choose option: ";
 
+    /**
+     * Database main lifecycle.
+     * Available options:
+     * - exit
+     * - add record
+     * - print all phone numbers by name
+     * - print all names by phone number
+     * - delete record
+     * - change name of record
+     * - change phone number of record
+     * - print all records
+     */
     public static void main(String[] args) {
         var phonebook = PhonebookManager.getInstance();
         var scanner = new Scanner(System.in);

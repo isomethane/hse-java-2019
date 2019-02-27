@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/** Class represents name entity in phonebook database managed by {@link PhonebookManager}. **/
 @Entity
 @Table(name = "NAME")
 class Name {
@@ -63,6 +64,7 @@ class Name {
         return phones.stream().map(Phone::getPhoneNumber).collect(Collectors.toSet());
     }
 
+    /** Compares entities by unique name. */
     @Override
     public boolean equals(Object o) {
         if (this == o) {

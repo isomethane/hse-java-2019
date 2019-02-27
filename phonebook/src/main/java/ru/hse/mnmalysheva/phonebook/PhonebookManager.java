@@ -18,9 +18,13 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Phonebook database manager. Data is stored in one database specified in hibernate.cfg.xml file,
+ * so only one instance of this class can exist at every moment. Thread unsafe.
+ * Compares names and prone numbers as {@link String}s, so data should be passed already in unified format.
+ */
 public class PhonebookManager implements AutoCloseable {
     private static PhonebookManager instance;
-
     private SessionFactory sessionFactory;
 
     {
@@ -29,7 +33,7 @@ public class PhonebookManager implements AutoCloseable {
     }
     
     private PhonebookManager() {}
-    
+
     public static @NotNull PhonebookManager getInstance() {
         if (instance == null) {
             instance = new PhonebookManager();
@@ -37,6 +41,7 @@ public class PhonebookManager implements AutoCloseable {
         return instance;
     }
 
+    /** Closes connection with database and releases resources. **/
     @Override
     public void close() {
         if (sessionFactory != null) {
@@ -45,6 +50,11 @@ public class PhonebookManager implements AutoCloseable {
         }
     }
 
+    /**
+     * Creates connection between specified name and phone number.
+     * If any of them did not exist in database, it is added.
+     * @return <code>true</code> if specified name and phone were not connected yet.
+     */
     public boolean add(@NotNull String name, @NotNull String phone) {
         return commitTransaction(session -> {
             var nameEntity = addNameIfNotPresented(session, name);
@@ -58,6 +68,7 @@ public class PhonebookManager implements AutoCloseable {
         });
     }
 
+    /** Returns all phone numbers owned by person with specified name. **/
     public Set<String> getPhonesByName(@NotNull String name) {
         return commitTransaction(session -> {
             var nameEntity = loadName(session, name);
@@ -65,6 +76,7 @@ public class PhonebookManager implements AutoCloseable {
         });
     }
 
+    /** Returns all owners of the specified phone number. **/
     public Set<String> getNamesByPhone(@NotNull String phone) {
         return commitTransaction(session -> {
             var phoneEntity = loadPhone(session, phone);
@@ -72,6 +84,11 @@ public class PhonebookManager implements AutoCloseable {
         });
     }
 
+    /**
+     * Deletes connection between specified name and phone number.
+     * If any of them did not exist in database, this function does nothing.
+     * @return <code>true</code> if specified name and phone were connected before.
+     */
     public boolean delete(@NotNull String name, @NotNull String phone) {
         boolean isSuccessful = deleteConnection(name, phone);
         deleteNameIfRedundant(name);
@@ -79,6 +96,11 @@ public class PhonebookManager implements AutoCloseable {
         return isSuccessful;
     }
 
+    /**
+     * Changes name in specified pair name-phone.
+     * If any of them did not exist in database, this function does nothing.
+     * @return <code>true</code> if specified name and phone were connected before.
+     */
     public boolean changeName(@NotNull String name, @NotNull String phone, @NotNull String newName) {
         if (!deleteConnection(name, phone)) {
             return false;
@@ -88,6 +110,11 @@ public class PhonebookManager implements AutoCloseable {
         return true;
     }
 
+    /**
+     * Changes phone in specified pair name-phone.
+     * If any of them did not exist in database, this function does nothing.
+     * @return <code>true</code> if specified name and phone were connected before.
+     */
     public boolean changePhone(@NotNull String name, @NotNull String phone, @NotNull String newPhone) {
         if (!deleteConnection(name, phone)) {
             return false;
@@ -97,6 +124,10 @@ public class PhonebookManager implements AutoCloseable {
         return true;
     }
 
+    /**
+     * Returns all data stored in database as {@link Map},
+     * where <code>key</code> is name and <code>value</code> is {@link Set} of phone numbers.
+     */
     public @NotNull Map<String, Set<String>> getContent() {
         return commitTransaction(session -> {
             @SuppressWarnings("unchecked")
@@ -106,7 +137,12 @@ public class PhonebookManager implements AutoCloseable {
             );
         });
     }
-    public void clear() {
+
+    /**
+     * Clears database.
+     * Note that this method only works if database drops automatically on when connection is opened or closed.
+     */
+    void clear() {
         close();
         initSessionFactory();
     }

@@ -16,31 +16,6 @@ class StackCalculatorTest {
         var mockList = (List<Integer>) mock(ArrayList.class);
         var calculator = new StackCalculator(mockList);
         when(mockList.get(anyInt())).thenReturn(2, 1, 5, 3, 8);
-        when(mockList.size()).thenReturn(1);
-
-        assertEquals(8, calculator.calculate("1 2 + 5 +"));
-
-        var inOrder = inOrder(mockList);
-        inOrder.verify(mockList).add(1);
-        inOrder.verify(mockList).add(2);
-        inOrder.verify(mockList).add(3);
-        inOrder.verify(mockList).add(5);
-        inOrder.verify(mockList).add(8);
-
-        inOrder = inOrder(mockList);
-        inOrder.verify(mockList).get(1);
-        inOrder.verify(mockList).get(0);
-        inOrder.verify(mockList).get(1);
-        inOrder.verify(mockList).get(0);
-        inOrder.verify(mockList).get(0);
-    }
-
-    @Test
-    void testComplex() {
-        @SuppressWarnings("unchecked")
-        var mockList = (List<Integer>) mock(ArrayList.class);
-        var calculator = new StackCalculator(mockList);
-        when(mockList.get(anyInt())).thenReturn(2, 1, 5, 3, 8);
         when(mockList.size()).thenReturn(2, 2, 1, 1, 2, 2, 1, 1, 1);
 
         assertEquals(8, calculator.calculate("1 2 + 5 +"));

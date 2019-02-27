@@ -17,7 +17,7 @@ class StackCalculatorTest {
         var mockList = (List<Integer>) mock(ArrayList.class);
         var calculator = new StackCalculator(mockList);
         when(mockList.get(anyInt())).thenReturn(2, 1, 5, 3, 8);
-        when(mockList.size()).thenReturn(2, 2, 1, 1, 2, 2, 1, 1, 1);
+        when(mockList.size()).thenReturn(0,2, 2, 1, 1, 2, 2, 1, 1, 1);
 
         assertEquals(8, calculator.calculate("1 2 + 5 +")); // 1 + 2 + 5
 
@@ -50,7 +50,7 @@ class StackCalculatorTest {
         var mockList = (List<Integer>) mock(ArrayList.class);
         var calculator = new StackCalculator(mockList);
         when(mockList.get(anyInt())).thenReturn(1, 3, 2, 7, 4, 14, 3, 18, 6);
-        when(mockList.size()).thenReturn(3, 3, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 1);
+        when(mockList.size()).thenReturn(0,3, 3, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 1);
 
         assertEquals(6, calculator.calculate("7 3 1 - * 4 + 3 /")); // (7 * (3 - 1) + 4) / 3
 
@@ -88,7 +88,7 @@ class StackCalculatorTest {
         var mockList = (List<Integer>) mock(ArrayList.class);
         var calculator = new StackCalculator(mockList);
         when(mockList.get(anyInt())).thenReturn(20, 500, 480, 150, 30, 4500);
-        when(mockList.size()).thenReturn(2, 2, 1, 1, 1, 2, 2, 1, 1, 1);
+        when(mockList.size()).thenReturn(0,2, 2, 1, 1, 1, 0, 2, 2, 1, 1, 1);
 
         assertEquals(480, calculator.calculate("500 20 -"));
         assertEquals(4500, calculator.calculate("30 150 *"));
@@ -124,7 +124,7 @@ class StackCalculatorTest {
         var mockList = (List<Integer>) mock(ArrayList.class);
         var calculator = new StackCalculator(mockList);
         when(mockList.get(anyInt())).thenReturn(2, -100, -200);
-        when(mockList.size()).thenReturn(2, 2, 1, 1, 1);
+        when(mockList.size()).thenReturn(0,2, 2, 1, 1, 1);
 
         assertEquals(-200, calculator.calculate("-100 2 *"));
 

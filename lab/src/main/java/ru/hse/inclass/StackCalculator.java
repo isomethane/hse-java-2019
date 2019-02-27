@@ -23,6 +23,10 @@ public class StackCalculator {
     }
 
     public int calculate(String str) {
+        if (stack.size() != 0) {
+            throw new IllegalStateException();
+        }
+
         Scanner in = new Scanner(str);
 
         while(in.hasNext()) {

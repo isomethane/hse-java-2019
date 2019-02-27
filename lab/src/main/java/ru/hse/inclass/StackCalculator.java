@@ -65,7 +65,7 @@ public class StackCalculator {
             stack.remove(0);
             return result;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
     }
 }

@@ -3,6 +3,7 @@ package ru.hse.inclass;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,5 +59,26 @@ class StackCalculatorTest {
         inOrder.verify(mockList).get(1);
         inOrder.verify(mockList).get(0);
         inOrder.verify(mockList).get(0);
+    }
+
+    @Test
+    void testBasic() {
+        var stackCalculator = new StackCalculator(new ArrayList<>());
+        assertEquals(15, stackCalculator.calculate("1 2 + 4 * 3 +"));
+        assertEquals(5, stackCalculator.calculate("15 7 1 1 + - / 3 * 2 1 1 + + -"));
+        assertEquals(2, stackCalculator.calculate("4 2 5 * + 1 3 2 * + /"));
+        assertEquals(2, stackCalculator.calculate("2 5 * 4 + 3 2 * 1 + /"));
+    }
+
+    @Test
+    void testThrows() {
+        StackCalculator stackCalculator;
+        assertThrows(IllegalArgumentException.class, ()-> new StackCalculator(Collections.singletonList(1)));
+
+        stackCalculator = new StackCalculator(new ArrayList<>());
+        assertThrows(IllegalArgumentException.class, () -> stackCalculator.calculate("1 2 3 +"));
+
+        var stackCalculator2 = new StackCalculator(new ArrayList<>());
+        assertThrows(IllegalArgumentException.class, () -> stackCalculator2.calculate("1 2 ^"));
     }
 }

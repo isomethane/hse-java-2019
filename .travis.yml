@@ -4,5 +4,12 @@ jdk:
 os:
   - linux
 env:
+  - PROJECT_DIR=hashtable
+  - PROJECT_DIR=trie
+  - PROJECT_DIR=treeset
   - PROJECT_DIR=phonebook
-script: cd $PROJECT_DIR && ./gradlew check
+  - PROJECT_DIR=reflector
+script:
+if [ -d "$PROJECT_DIR" ]; then
+  cd $PROJECT_DIR && ./gradlew check
+fi

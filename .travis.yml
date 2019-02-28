@@ -11,6 +11,6 @@ env:
   - PROJECT_DIR=reflector
 script:
   - if [ -d "$PROJECT_DIR" ]; then
-      cd $PROJECT_DIR && ./gradlew check
+      cd $PROJECT_DIR && ./gradlew check;
     fi
 

@@ -3,14 +3,9 @@ jdk:
   - oraclejdk11
 os:
   - linux
-env:
-  - PROJECT_DIR=hashtable
-  - PROJECT_DIR=trie
-  - PROJECT_DIR=treeset
-  - PROJECT_DIR=phonebook
-  - PROJECT_DIR=reflector
 script:
-  - if [ -d "$PROJECT_DIR" ]; then
-      cd $PROJECT_DIR && ./gradlew check;
-    fi
-
+  - for PROJECT_DIR in `find * -maxdepth 0 -type d -not -name '.git'`; do
+      cd $PROJECT_DIR;
+      ./gradlew check;
+      cd ..;
+    done

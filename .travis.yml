@@ -1,0 +1,15 @@
+language:
+  - java
+jdk:
+  - oraclejdk11
+os:
+  - linux
+script:
+  - exit_code=0;
+    for project_dir in $(find * -maxdepth 0 -type d -not -name '.git'); do
+      cd $project_dir;
+      ./gradlew check;
+      exit_code=$(( $? || exit_code ));
+      cd ..;
+    done;
+    return $exit_code

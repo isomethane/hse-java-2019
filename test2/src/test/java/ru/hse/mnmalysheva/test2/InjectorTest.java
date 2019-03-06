@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import ru.hse.mnmalysheva.test2.testclasses.InterfaceImpl;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 public class InjectorTest {
@@ -49,6 +50,16 @@ public class InjectorTest {
                 () -> Injector.initialize(
                 "ru.hse.mnmalysheva.test2.testclasses.ClassWithOneInterfaceDependency",
                         Collections.emptyList()
+                )
+        );
+
+        assertThrows(AmbiguousImplementationException.class,
+                () -> Injector.initialize(
+                        "ru.hse.mnmalysheva.test2.testclasses.ClassWithOneInterfaceDependency",
+                        Arrays.asList(
+                                "ru.hse.mnmalysheva.test2.testclasses.InterfaceImpl",
+                                "ru.hse.mnmalysheva.test2.testclasses.InterfaceImpl2"
+                        )
                 )
         );
     }

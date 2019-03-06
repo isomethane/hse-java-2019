@@ -42,4 +42,14 @@ public class InjectorTest {
         ClassWithOneInterfaceDependency instance = (ClassWithOneInterfaceDependency) object;
         assertTrue(instance.dependency instanceof InterfaceImpl);
     }
+
+    @Test
+    public void exceptionsTest() {
+        assertThrows(ImplementationNotFoundException.class,
+                () -> Injector.initialize(
+                "ru.hse.mnmalysheva.test2.testclasses.ClassWithOneInterfaceDependency",
+                        Collections.emptyList()
+                )
+        );
+    }
 }

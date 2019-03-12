@@ -55,11 +55,24 @@ class ReflectorTest {
                 "public class SomeClass {\n" +
                 "\tpublic static final int a = 0;\n" +
                 "\tprivate double b;\n" +
-                "\tprotected String c;\n" +
+                "\tprotected final String c = null;\n" +
+                "\tfinal boolean d = false;\n" +
                 "\tjava.util.Collection<String> bar() {\n" +
                 "\t\treturn null;\n" +
                 "\t}\n" +
                 "\tvoid foo(java.util.Set<Integer> arg0) {}\n" +
+                "\tint getA() {\n" +
+                "\t\treturn 0;\n" +
+                "\t}\n" +
+                "\tdouble getB() {\n" +
+                "\t\treturn 0;\n" +
+                "\t}\n" +
+                "\tString getC() {\n" +
+                "\t\treturn null;\n" +
+                "\t}\n" +
+                "\tboolean getD() {\n" +
+                "\t\treturn false;\n" +
+                "\t}\n" +
                 "}\n";
         assertEquals(expected, printStructureResult(SimpleClass.class));
 

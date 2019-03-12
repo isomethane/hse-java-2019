@@ -105,13 +105,13 @@ class Reflector {
     }
 
     private static String correctClassText(@NotNull String classText, @NotNull String className) {
-        var canonical = classText.replace("$", ".");
-        var simplified = canonical.replaceAll(
-                "(?<!\\p{Alpha}|\\.)java\\.lang\\.(?=\\p{Upper})", ""
-        );
-        return simplified.replaceAll(
+        return classText.replace(
+                "$", "."
+        ).replaceAll(
                 "(?<!\\p{Alpha}|\\.)" + className.replace(".", "\\.") + "(?!\\p{Alpha})",
                 CLASS_NAME
+        ).replaceAll(
+                "(?<!\\p{Alpha}|\\.)java\\.lang\\.(?=\\p{Upper})", ""
         );
     }
 

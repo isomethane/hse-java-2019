@@ -165,6 +165,23 @@ class Reflector {
         return "(" + parametersString + ")";
     }
 
+    private static @NotNull String defaultValueString(Class<?> type) {
+        return type.isPrimitive() ? type == boolean.class ? "false" : "0" : "null";
+    }
+
+    private static @NotNull String methodBodyString(@NotNull Method method, int indent) {
+        if (Modifier.isAbstract(method.getModifiers())) {
+            return ";";
+        }
+        var returnType = method.getReturnType();
+        if (returnType == void.class) {
+            return " {}";
+        }
+        return " {\n" +
+                indentString(indent + 1) + "return " + defaultValueString(returnType) + ";\n" +
+                indentString(indent) + "}";
+    }
+
     private static void printHeading(@NotNull Class<?> someClass,
                                      boolean isRootClass,
                                      int indent,
@@ -205,7 +222,7 @@ class Reflector {
                     .append(SPACE)
                     .append(field.getName());
             if (Modifier.isFinal(field.getModifiers())) {
-                builder.append(" = ").append(field.getType().isPrimitive() ? "0" : "null");
+                builder.append(" = ").append(defaultValueString(field.getType()));
             }
             builder.append(";\n");
         }
@@ -240,17 +257,7 @@ class Reflector {
                                 .sorted()
                                 .collect(Collectors.joining(", ")));
             }
-
-            if (Modifier.isAbstract(method.getModifiers())) {
-                builder.append(";");
-            } else {
-                builder.append(" {\n")
-                        .append(indentString(indent + 1))
-                        .append("throw new UnsupportedOperationException();\n")
-                        .append(indentString(indent))
-                        .append("}");
-            }
-            builder.append("\n");
+            builder.append(methodBodyString(method, indent)).append("\n");
         }
     }
 

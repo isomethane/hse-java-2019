@@ -57,11 +57,9 @@ class ReflectorTest {
                 "\tprivate double b;\n" +
                 "\tprotected String c;\n" +
                 "\tjava.util.Collection<String> bar() {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\treturn null;\n" +
                 "\t}\n" +
-                "\tvoid foo(java.util.Set<Integer> arg0) {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tvoid foo(java.util.Set<Integer> arg0) {}\n" +
                 "}\n";
         assertEquals(expected, printStructureResult(SimpleClass.class));
 
@@ -83,15 +81,11 @@ class ReflectorTest {
                 "public class SomeClass<K extends Number, V> {\n" +
                 "\tK key;\n" +
                 "\tV value;\n" +
-                "\tpublic <M extends K> void bar(M arg0) {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tpublic <M extends K> void bar(M arg0) {}\n" +
                 "\tprivate static <K, V> V foo(K arg0) {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\treturn null;\n" +
                 "\t}\n" +
-                "\tpublic void fooBar(java.util.Collection<? super K> arg0, java.util.Set<? extends V> arg1) {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tpublic void fooBar(java.util.Collection<? super K> arg0, java.util.Set<? extends V> arg1) {}\n" +
                 "}\n";
 
         assertEquals(expected, printStructureResult(GenericClass.class));
@@ -115,9 +109,7 @@ class ReflectorTest {
                 "public abstract class SomeClass {\n" +
                 "\tpublic abstract void bar();\n" +
                 "\tprotected abstract int foo(double arg0, char arg1);\n" +
-                "\tprivate void fooBar() {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tprivate void fooBar() {}\n" +
                 "}\n";
 
         assertEquals(expected, printStructureResult(AbstractClass.class));
@@ -130,24 +122,22 @@ class ReflectorTest {
                 "\tprivate SomeClass<E>.Inner inner;\n" +
                 "\tprivate SomeClass.Nested<String> nested;\n" +
                 "\tpublic java.util.Set<Integer> bar() {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\treturn null;\n" +
                 "\t}\n" +
-                "\tpublic void foo(java.util.Set<Integer> arg0) {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tpublic void foo(java.util.Set<Integer> arg0) {}\n" +
                 "\tprivate class Inner {\n" +
                 "\t\tjava.util.Set<Integer> set;\n" +
                 "\t\tE foo(SomeClass<E>.Inner arg0) {\n" +
-                "\t\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\t\treturn null;\n" +
                 "\t\t}\n" +
                 "\t}\n" +
                 "\tprivate static class Nested<E> {\n" +
                 "\t\tprivate String string;\n" +
                 "\t\tint bar(String arg0) {\n" +
-                "\t\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\t\treturn 0;\n" +
                 "\t\t}\n" +
                 "\t\t<T extends E> T foo(SomeClass<E> arg0) {\n" +
-                "\t\t\tthrow new UnsupportedOperationException();\n" +
+                "\t\t\treturn null;\n" +
                 "\t\t}\n" +
                 "\t}\n" +
                 "\tprivate abstract static interface NestedInterface<E> {\n" +
@@ -163,9 +153,7 @@ class ReflectorTest {
     void printStructureThrowing() {
         var expected =
                 "public class SomeClass<T extends Exception> {\n" +
-                "\tpublic void foo() throws T, java.io.IOException {\n" +
-                "\t\tthrow new UnsupportedOperationException();\n" +
-                "\t}\n" +
+                "\tpublic void foo() throws T, java.io.IOException {}\n" +
                 "}\n";
 
         assertEquals(expected, printStructureResult(ThrowingClass.class));

@@ -163,7 +163,7 @@ class ReflectorTest {
     void printStructureThrowing() {
         var expected =
                 "public class SomeClass<T extends Exception> {\n" +
-                "\tpublic void foo() throws java.io.IOException, T {\n" +
+                "\tpublic void foo() throws T, java.io.IOException {\n" +
                 "\t\tthrow new UnsupportedOperationException();\n" +
                 "\t}\n" +
                 "}\n";

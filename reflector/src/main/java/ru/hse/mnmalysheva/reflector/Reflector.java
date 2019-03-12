@@ -237,6 +237,7 @@ class Reflector {
                 builder.append(THROWS)
                         .append(Stream.of(exceptions)
                                 .map(Type::getTypeName)
+                                .sorted()
                                 .collect(Collectors.joining(", ")));
             }
 

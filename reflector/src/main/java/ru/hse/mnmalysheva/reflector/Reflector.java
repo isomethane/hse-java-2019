@@ -71,7 +71,7 @@ class Reflector {
         var firstMinusSecond = classDifference(firstClass, secondClass);
         var secondMinusFirst = classDifference(secondClass, firstClass);
         if (firstMinusSecond.isEmpty() && secondMinusFirst.isEmpty()) {
-            out.println("Classes are identical");
+            out.print("Classes are identical\n");
         } else {
             out.print(firstMinusSecond);
             out.print(secondMinusFirst);

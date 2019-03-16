@@ -140,7 +140,7 @@ public class PhonebookManager implements AutoCloseable {
 
     /**
      * Clears database.
-     * Note that this method only works if database drops automatically on when connection is opened or closed.
+     * Note that this method only works if database drops automatically when connection is opened or closed.
      */
     void clear() {
         close();

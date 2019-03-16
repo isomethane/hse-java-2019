@@ -20,7 +20,7 @@ public class PhonebookUI {
             "| 6 - change phone number of record   |\n" +
             "| 7 - print all records               |\n" +
             "*-------------------------------------*\n" +
-            "Choose option: ";
+            "Choose option:";
 
     /**
      * Database main lifecycle.
@@ -40,7 +40,7 @@ public class PhonebookUI {
         boolean toExit = false;
 
         while (!toExit) {
-            System.out.print(OPTIONS);
+            System.out.println(OPTIONS);
             int option;
             try {
                 option = Integer.parseInt(scanner.nextLine().replaceAll("\\s", ""));
@@ -114,12 +114,12 @@ public class PhonebookUI {
     }
 
     private static @NotNull String readName(@NotNull String prompt, @NotNull Scanner scanner) {
-        System.out.print("Input " + prompt + ": ");
+        System.out.println("Input " + prompt + ":");
         return scanner.nextLine();
     }
 
     private static @NotNull String readPhone(@NotNull String prompt, @NotNull Scanner scanner) {
-        System.out.print("Input " + prompt + ": ");
+        System.out.println("Input " + prompt + ":");
         boolean isCorrect = false;
         String phone = null;
         while (!isCorrect) {
@@ -127,7 +127,7 @@ public class PhonebookUI {
                 phone = unifyNumber(scanner.nextLine());
                 isCorrect = true;
             } catch (NumberParseException e) {
-                System.out.print("Incorrect phone number, please try again: ");
+                System.out.println("Incorrect phone number, please try again:");
             }
         }
         return phone;

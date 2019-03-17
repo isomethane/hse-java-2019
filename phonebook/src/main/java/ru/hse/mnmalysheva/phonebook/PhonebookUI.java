@@ -21,6 +21,8 @@ public class PhonebookUI {
             "| 7 - print all records               |\n" +
             "*-------------------------------------*\n" +
             "Choose option:";
+    private static final String RECORD_EXISTS_MESSAGE = "Record already exists.";
+    private static final String RECORD_DOES_NOT_EXIST_MESSAGE = "Record does not exist.";
 
     /**
      * Database main lifecycle.
@@ -49,7 +51,6 @@ public class PhonebookUI {
             }
             String name, newName;
             String phone, newPhone;
-            String result;
             switch (option) {
                 case 0:
                     phonebook.close();
@@ -58,46 +59,64 @@ public class PhonebookUI {
                 case 1:
                     name = readName("name", scanner);
                     phone = readPhone("phone number", scanner);
-                    phonebook.add(name, phone);
+                    if (phonebook.add(name, phone)) {
+                        System.out.println("Record was successfully added.");
+                    } else {
+                        System.out.println(RECORD_EXISTS_MESSAGE);
+                    }
                     break;
                 case 2:
                     name = readName("name", scanner);
-                    result = String.join(", ", phonebook.getPhonesByName(name));
-                    if (result.isEmpty()) {
-                        System.out.println("There are no phones owned by " + name + " in the phonebook");
+                    var phones = phonebook.getPhonesByName(name);
+                    if (phones.isEmpty()) {
+                        System.out.println("There are no phones owned by " + name + " in the phonebook.");
                     } else {
-                        System.out.println(result);
+                        System.out.println("Phone numbers of " + name + ":");
+                        System.out.println(String.join(", ", phones));
                     }
                     break;
                 case 3:
                     phone = readPhone("phone", scanner);
-                    result = String.join(", ", phonebook.getNamesByPhone(phone));
-                    if (result.isEmpty()) {
-                        System.out.println("There are no owners of " + phone + " in the phonebook");
+                    var names = phonebook.getNamesByPhone(phone);
+                    if (names.isEmpty()) {
+                        System.out.println("There are no owners of " + phone + " in the phonebook.");
                     } else {
-                        System.out.println(result);
+                        System.out.println("Owners of " + phone + ":");
+                        System.out.println(String.join(", ", phonebook.getNamesByPhone(phone)));
                     }
                     break;
                 case 4:
                     name = readName("name", scanner);
                     phone = readPhone("phone number", scanner);
-                    phonebook.delete(name, phone);
+                    if (phonebook.delete(name, phone)) {
+                        System.out.println("Record was successfully deleted.");
+                    } else {
+                        System.out.println(RECORD_DOES_NOT_EXIST_MESSAGE);
+                    }
                     break;
                 case 5:
                     name = readName("name", scanner);
                     phone = readPhone("phone number", scanner);
                     newName = readName("new name", scanner);
-                    phonebook.changeName(name, phone, newName);
+                    if (phonebook.changeName(name, phone, newName)) {
+                        System.out.println("Name was successfully changed.");
+                    } else {
+                        System.out.println(RECORD_DOES_NOT_EXIST_MESSAGE);
+                    }
                     break;
                 case 6:
                     name = readName("name", scanner);
                     phone = readPhone("phone number", scanner);
                     newPhone = readPhone("new phone number", scanner);
-                    phonebook.changePhone(name, phone, newPhone);
+                    if (phonebook.changePhone(name, phone, newPhone)) {
+                        System.out.println("Phone was successfully changed.");
+                    } else {
+                        System.out.println(RECORD_DOES_NOT_EXIST_MESSAGE);
+                    }
                     break;
                 case 7:
-                    phonebook.getContent().forEach((keyName, phones) ->
-                            phones.forEach(
+                    phonebook.getContent().forEach((keyName, phoneNumbers) ->
+                            phoneNumbers.forEach(
                                     phoneNumber -> System.out.println("Name: " + keyName + ", Phone: " + phoneNumber)
                             )
                     );

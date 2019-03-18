@@ -37,19 +37,27 @@ public class MultithreadedSortingAnalyzer {
         System.out.print(" elements, ");
 
         testList = new ArrayList<>(shuffled);
+        var singleThreadTime = checkTime(() -> Collections.sort(testList));
 
         System.out.print("Standard sorting: ");
-        printTime(checkTime(() -> Collections.sort(testList)));
+        printTime(singleThreadTime);
+
+        long maximumTime = 0;
         for (var sorter : sorters) {
             testList = new ArrayList<>(shuffled);
             System.out.print(", ");
             System.out.print(sorter.getNumberOfThreads() + " threads: ");
-            printTime(checkTime(() -> {
+            var time = checkTime(() -> {
                 try {
                     sorter.sort(testList).get();
                 } catch (Exception ignored) {}
-            }));
+            });
+            printTime(time);
+            maximumTime = Long.max(maximumTime, time);
             assert(testList.equals(expected));
+        }
+        if (maximumTime < singleThreadTime) {
+            System.out.print(". Multithreaded sorting wins!");
         }
         System.out.println();
     }

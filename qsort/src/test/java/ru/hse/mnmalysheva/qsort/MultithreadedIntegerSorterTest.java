@@ -5,10 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,5 +73,41 @@ class MultithreadedIntegerSorterTest {
 
         assertEquals(expected, testList);
         assertEquals(expected, secondTestList);
+    }
+
+    @Test
+    void sortLinkedList() throws ExecutionException, InterruptedException {
+        sorter = new MultithreadedIntegerSorter();
+        testList = new LinkedList<>(shuffled);
+        sorter.sort(testList).get();
+        assertEquals(expected, testList);
+    }
+
+    @Test
+    void sortSubLists() throws ExecutionException, InterruptedException {
+        sorter = new MultithreadedIntegerSorter();
+        testList = new LinkedList<>();
+        for (int i = 999; i >= 0; i--) {
+            testList.add(i);
+        }
+        var completedFirst = sorter.sort(testList.subList(0, 500));
+        var completedSecond = sorter.sort(testList.subList(500, 750));
+        var completedThird = sorter.sort(testList.subList(750, 1000));
+
+        completedFirst.get();
+        completedSecond.get();
+        completedThird.get();
+
+        var expected = new LinkedList<>();
+        for (int i = 500; i < 1000; i++) {
+            expected.add(i);
+        }
+        for (int i = 250; i < 500; i++) {
+            expected.add(i);
+        }
+        for (int i = 0; i < 250; i++) {
+            expected.add(i);
+        }
+        assertEquals(expected, testList);
     }
 }

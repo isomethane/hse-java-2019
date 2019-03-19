@@ -2,6 +2,7 @@ package ru.hse.mnmalysheva.qsort;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,18 +26,18 @@ public class MultithreadedSortingAnalyzer {
      * @param size size of list to sort
      */
     public static void compareSorts(int size) {
-        var expected = new ArrayList<Integer>();
+        var expected = new LinkedList<Integer>();
         for (int i = 0; i < size; i++) {
             expected.add(i);
         }
-        var shuffled = new ArrayList<>(expected);
+        var shuffled = new LinkedList<>(expected);
         Collections.shuffle(shuffled);
 
         System.out.print("List size: ");
         printListSize(size);
         System.out.print(" elements, ");
 
-        testList = new ArrayList<>(shuffled);
+        testList = new LinkedList<>(shuffled);
         var singleThreadTime = checkTime(() -> Collections.sort(testList));
 
         System.out.print("Standard sorting: ");
@@ -44,7 +45,7 @@ public class MultithreadedSortingAnalyzer {
 
         long maximumTime = 0;
         for (var sorter : sorters) {
-            testList = new ArrayList<>(shuffled);
+            testList = new LinkedList<>(shuffled);
             System.out.print(", ");
             System.out.print(sorter.getNumberOfThreads() + " threads: ");
             var time = checkTime(() -> {

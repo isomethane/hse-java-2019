@@ -1,5 +1,7 @@
 package ru.hse.mnmalysheva.qsort;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
@@ -36,7 +38,7 @@ public class MultithreadedIntegerSorter {
      * @param list list to sort
      * @return a {@code Future} representing pending completion of sorting
      */
-    public Future<Void> sort(List<Integer> list) {
+    public Future<Void> sort(@NotNull List<Integer> list) {
         return threadPool.submit(new QuickSortTask(list));
     }
 
@@ -45,7 +47,7 @@ public class MultithreadedIntegerSorter {
         List<Integer> lessPart;
         List<Integer> greaterPart;
 
-        private QuickSortTask(List<Integer> list) {
+        private QuickSortTask(@NotNull List<Integer> list) {
             this.list = list;
         }
 

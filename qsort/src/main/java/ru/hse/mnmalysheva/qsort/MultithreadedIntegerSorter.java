@@ -39,32 +39,50 @@ public class MultithreadedIntegerSorter {
      * @return a {@code Future} representing pending completion of sorting
      */
     public Future<Void> sort(@NotNull List<Integer> list) {
-        return threadPool.submit(new QuickSortTask(list));
+        return threadPool.submit(new RecursiveAction() {
+            @Override
+            protected void compute() {
+                var arrayList = new ArrayList<>(list);
+                new QuickSortTask(arrayList, 0, arrayList.size()).invoke();
+
+                var iterator = list.listIterator();
+                for (var element : arrayList) {
+                    iterator.next();
+                    iterator.set(element);
+                }
+            }
+        });
     }
 
     private class QuickSortTask extends RecursiveAction {
-        List<Integer> list;
-        List<Integer> lessPart;
-        List<Integer> greaterPart;
+        private final ArrayList<Integer> list;
+        private final int fromIndex;
+        private final int toIndex;
 
-        private QuickSortTask(@NotNull List<Integer> list) {
+        private QuickSortTask(@NotNull ArrayList<Integer> list, int fromIndex, int toIndex) {
+            assert fromIndex >= 0 && toIndex <= list.size();
             this.list = list;
+            this.fromIndex = fromIndex;
+            this.toIndex = toIndex;
         }
 
         @Override
         protected void compute() {
-            if (list.size() < STANDARD_SORTING_THRESHOLD) {
-                Collections.sort(list);
+            if (toIndex - fromIndex < STANDARD_SORTING_THRESHOLD) {
+                Collections.sort(list.subList(fromIndex, toIndex));
             } else {
-                partition(random.nextInt(list.size()));
-                invokeAll(new QuickSortTask(lessPart), new QuickSortTask(greaterPart));
+                int bound = partition();
+                invokeAll(
+                        new QuickSortTask(list, fromIndex, bound),
+                        new QuickSortTask(list, bound, toIndex)
+                );
             }
         }
 
-        private void partition(int pivotIndex) {
-            int pivot = list.get(pivotIndex);
-            int i = 0;
-            int j = list.size() - 1;
+        private int partition() {
+            int pivot = list.get(fromIndex + random.nextInt(toIndex - fromIndex));
+            int i = fromIndex;
+            int j = toIndex - 1;
             while (i <= j) {
                 while (list.get(i) < pivot) {
                     i++;
@@ -76,8 +94,7 @@ public class MultithreadedIntegerSorter {
                     Collections.swap(list, i++, j--);
                 }
             }
-            lessPart = list.subList(0, j + 1);
-            greaterPart = list.subList(i, list.size());
+            return i;
         }
     }
 }

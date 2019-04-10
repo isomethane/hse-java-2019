@@ -1,5 +1,8 @@
 package ru.hse.inclass;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class LazyFactory {
@@ -15,33 +18,71 @@ public class LazyFactory {
         return new LockFreeLazy<>(supplier);
     }
 
-    private static class LockedLazy<T> implements Lazy<T> {
-        private LockedLazy(Supplier<T> supplier) {
+    private static class SingleThreadedLazy<T> implements Lazy<T> {
+        private T value;
+        private Supplier<T> supplier;
+
+        private SingleThreadedLazy(@NotNull Supplier<T> supplier) {
+            this.supplier = supplier;
         }
 
         @Override
         public T get() {
-            return null;
+            if (supplier != null) {
+                value = supplier.get();
+                supplier = null;
+            }
+            return value;
+        }
+    }
+
+    private static class LockedLazy<T> implements Lazy<T> {
+        private volatile Box<T> value = null;
+        private Supplier<T> supplier;
+
+        private LockedLazy(@NotNull Supplier<T> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Override
+        public synchronized T get() {
+            var local = value;
+            if (local == null) {
+                synchronized (this) {
+                    local = value;
+                    if (local == null) {
+                        value = local = new Box<>(supplier.get());
+                    }
+                }
+            }
+            return local.value;
         }
     }
 
     private static class LockFreeLazy<T> implements Lazy<T> {
+        private AtomicReference<Box<T>> value = new AtomicReference<>(null);
+        private Supplier<T> supplier;
+
         private LockFreeLazy(Supplier<T> supplier) {
+            this.supplier = supplier;
         }
 
         @Override
         public T get() {
-            return null;
+            var local = value.get();
+            if (local == null) {
+                value.compareAndSet(null, new Box<>(supplier.get()));
+            }
+            local = value.get();
+            return local.value;
         }
     }
 
-    private static class SingleThreadedLazy<T> implements Lazy<T> {
-        private SingleThreadedLazy(Supplier<T> supplier) {
-        }
+    private static class Box<T> {
+        private T value;
 
-        @Override
-        public T get() {
-            return null;
+        private Box(T t) {
+            value = t;
         }
     }
 }

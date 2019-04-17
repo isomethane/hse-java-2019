@@ -6,25 +6,38 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class CountdownLatch {
     private final Lock lock = new ReentrantLock();
-    private final Condition waitCondition = lock.newCondition();
-    private final int maximumCount;
-    private int currentCount;
+    private final Condition reachedNull = lock.newCondition();
+    private final Condition becameNotNUll = lock.newCondition();
+    private int count;
 
     public CountdownLatch(int count) {
-        maximumCount = count;
+        this.count = count;
     }
 
-    public void await() {
+    public void await() throws InterruptedException {
         lock.lock();
-        if (currentCount > 0) {
-            try {
-                waitCondition.await();
-            } catch (InterruptedException ignored) {}
+        while (count > 0) {
+            reachedNull.await();
         }
         lock.unlock();
     }
 
-    public void countDown() {}
+    public void countDown() throws InterruptedException {
+        lock.lock();
+        while (count == 0) {
+            becameNotNUll.await();
+        }
+        count--;
+        if (count == 0) {
+            reachedNull.signalAll();
+        }
+        lock.unlock();
+    }
 
-    public void countUp() {}
+    public void countUp() {
+        lock.lock();
+        count++;
+        becameNotNUll.signalAll();
+        lock.unlock();
+    }
 }

@@ -19,7 +19,7 @@ class LazyFactoryTest {
         assertEquals(AAA, lazy.get());
     }
 
-    @RepeatedTest(5)
+    @RepeatedTest(20)
     void createLockedLazy() throws InterruptedException {
         // tmp
         ThreadSafeDummySupplier.currentIndex = 0;
@@ -60,7 +60,7 @@ class LazyFactoryTest {
         }
     }
 
-    @RepeatedTest(5)
+    @RepeatedTest(20)
     void createLockFreeLazy() throws InterruptedException {
         for (int k = 0; k < 10; k++) {
             var concurrentMap = new ConcurrentHashMap<Integer, Integer>();

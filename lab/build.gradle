@@ -1,6 +1,15 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
+
+javafx {
+    version = "12"
+    modules = [ 'javafx.controls' ]
+}
+
+mainClassName = 'TicTacToe'
 
 group 'ru.hse.mnmalysheva'
 version '1.0-SNAPSHOT'

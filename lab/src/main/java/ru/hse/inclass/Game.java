@@ -97,6 +97,19 @@ class Game {
         IN_PROGRESS,
         X_WIN,
         O_WIN,
-        DRAW
+        DRAW;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case X_WIN:
+                    return "X won!";
+                case O_WIN:
+                    return "O won!";
+                case DRAW:
+                    return "Draw!";
+            }
+            return "WTF???";
+        }
     }
 }

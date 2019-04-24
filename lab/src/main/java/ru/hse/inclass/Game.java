@@ -1,6 +1,6 @@
 package ru.hse.inclass;
 
-public class Game {
+class Game {
     private State[][] board;
     private final int N = 3;
     private State currentPlayer = State.X;

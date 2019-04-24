@@ -44,7 +44,7 @@ class Game {
                 return board[i][0].toGameResult();
             }
             if(!board[0][i].equals(State.EMPTY) && board[0][i].equals(board[1][i]) && board[1][i].equals(board[2][i])) {
-                return board[i][0].toGameResult();
+                return board[0][i].toGameResult();
             }
         }
         if(!board[0][0].equals(State.EMPTY) && board[0][0].equals(board[1][1]) && board[1][1].equals(board[2][2])) {

@@ -41,28 +41,48 @@ class GameTest {
     void getWinner() {
         var game1 = new Game();
         game1.setAt(1, 1);
-        assertEquals(Game.State.EMPTY, game1.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game1.getWinner());
         game1.setAt(0, 1);
-        assertEquals(Game.State.EMPTY, game1.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game1.getWinner());
         game1.setAt(0, 0);
-        assertEquals(Game.State.EMPTY, game1.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game1.getWinner());
         game1.setAt(0 , 2);
-        assertEquals(Game.State.EMPTY, game1.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game1.getWinner());
         game1.setAt(2, 2);
-        assertEquals(Game.State.X, game1.getWinner());
+        assertEquals(Game.GameResult.X_WIN, game1.getWinner());
 
         var game2 = new Game();
         game2.setAt(1, 2);
-        assertEquals(Game.State.EMPTY, game2.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game2.getWinner());
         game2.setAt(1, 1);
-        assertEquals(Game.State.EMPTY, game2.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game2.getWinner());
         game2.setAt(0, 1);
-        assertEquals(Game.State.EMPTY, game2.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game2.getWinner());
         game2.setAt(0, 0);
-        assertEquals(Game.State.EMPTY, game2.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game2.getWinner());
         game2.setAt(0 , 2);
-        assertEquals(Game.State.EMPTY, game2.getWinner());
+        assertEquals(Game.GameResult.IN_PROGRESS, game2.getWinner());
         game2.setAt(2, 2);
-        assertEquals(Game.State.O, game2.getWinner());
+        assertEquals(Game.GameResult.O_WIN, game2.getWinner());
+
+        var game3 = new Game();
+        game3.setAt(1, 1);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(2, 0);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(2, 2);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(0, 0);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(1, 0);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(1, 2);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(2, 1);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(0, 1);
+        assertEquals(Game.GameResult.IN_PROGRESS, game3.getWinner());
+        game3.setAt(0, 2);
+        assertEquals(Game.GameResult.DRAW, game3.getWinner());
     }
 }

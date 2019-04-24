@@ -38,22 +38,29 @@ class Game {
         return true;
     }
 
-    State getWinner() {
+    GameResult getWinner() {
         for(int i = 0; i < N; i++) {
             if(!board[i][0].equals(State.EMPTY) && board[i][0].equals(board[i][1]) && board[i][1].equals(board[i][2])) {
-                return board[i][0];
+                return board[i][0].toGameResult();
             }
             if(!board[0][i].equals(State.EMPTY) && board[0][i].equals(board[1][i]) && board[1][i].equals(board[2][i])) {
-                return board[i][0];
+                return board[i][0].toGameResult();
             }
         }
         if(!board[0][0].equals(State.EMPTY) && board[0][0].equals(board[1][1]) && board[1][1].equals(board[2][2])) {
-            return board[0][0];
+            return board[0][0].toGameResult();
         }
         if(!board[0][2].equals(State.EMPTY) && board[0][2].equals(board[1][1]) && board[1][1].equals(board[2][0])) {
-            return board[0][2];
+            return board[0][2].toGameResult();
         }
-        return State.EMPTY;
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; j < N; j++) {
+                if(board[i][j].equals(State.EMPTY)) {
+                    return GameResult.IN_PROGRESS;
+                }
+            }
+        }
+        return GameResult.DRAW;
     }
 
     enum State {
@@ -74,5 +81,22 @@ class Game {
             }
             return "WTF????";
         }
+
+        GameResult toGameResult() {
+            switch (this) {
+                case X:
+                    return GameResult.X_WIN;
+                case O:
+                    return GameResult.O_WIN;
+            }
+            return GameResult.IN_PROGRESS;
+        }
+    }
+
+    enum GameResult {
+        IN_PROGRESS,
+        X_WIN,
+        O_WIN,
+        DRAW
     }
 }

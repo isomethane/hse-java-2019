@@ -3,7 +3,7 @@ package ru.hse.mnmalysheva;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO general description
+/** Exception thrown when trying to get the result of a task that executed with an exception. **/
 public class LightExecutionException extends Exception {
     /** Constructs a {@code LightExecutionException} with {@code null} as its detail message. **/
     public LightExecutionException() {}

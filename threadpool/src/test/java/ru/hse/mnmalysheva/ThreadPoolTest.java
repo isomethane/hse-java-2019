@@ -56,15 +56,20 @@ class ThreadPoolTest {
 
     @RepeatedTest(REPEATED_TEST_COUNT)
     void testThreadPoolSize() throws LightExecutionException, InterruptedException {
-        final int numberOfTasks = 100000;
+        final int numberOfTasks = 16;
 
-        for (int numberOfThreads = 1; numberOfThreads <= 6; numberOfThreads++) {
+        for (int numberOfThreads = 1; numberOfThreads <= 8; numberOfThreads++) {
             ThreadPool pool = new ThreadPool(numberOfThreads);
 
             var futures = new ArrayList<LightFuture<Long>>();
             var results = new HashSet<Long>();
             for (int i = 0; i < numberOfTasks; i++) {
-                futures.add(pool.submit(() -> Thread.currentThread().getId()));
+                futures.add(pool.submit(() -> {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {}
+                    return Thread.currentThread().getId();
+                }));
             }
             for (var future : futures) {
                 results.add(future.get());

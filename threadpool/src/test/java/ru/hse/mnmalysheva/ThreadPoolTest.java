@@ -24,7 +24,7 @@ class ThreadPoolTest {
     }
 
     @AfterEach
-    void shutdown() {
+    void shutdown() throws InterruptedException {
         threadPool.shutdown();
     }
 
@@ -242,19 +242,19 @@ class ThreadPoolTest {
     }
 
     @Test
-    void cannotSubmitAfterShutdown() {
+    void cannotSubmitAfterShutdown() throws InterruptedException {
         threadPool.shutdown();
         assertThrows(IllegalStateException.class, () -> threadPool.submit(() -> 1));
     }
 
     @Test
-    void cannotApplyAfterShutdown() {
+    void cannotApplyAfterShutdown() throws InterruptedException {
         var future1 = threadPool.submit(() -> {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ignored) {
+            long result = 0;
+            for (int i = 0; i < 100000; i++) {
+                result += i;
             }
-            return 100;
+            return result;
         });
         var future2 = threadPool.submit(() -> 5);
         threadPool.shutdown();

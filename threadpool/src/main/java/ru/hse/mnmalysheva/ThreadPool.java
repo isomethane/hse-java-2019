@@ -43,13 +43,15 @@ public class ThreadPool {
     }
 
     /**
-     * Initiates thread pool shutdown.
+     * Shuts down thread pool.
      * All previously submitted tasks are executed, but no new tasks are accepted.
+     * @throws InterruptedException if current thread was interrupted while waiting.
      */
-    public void shutdown() {
+    public void shutdown() throws InterruptedException {
         toFinish = true;
         for (var thread : threads) {
             thread.interrupt();
+            thread.join();
         }
     }
 

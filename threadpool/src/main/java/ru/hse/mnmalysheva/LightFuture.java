@@ -22,5 +22,5 @@ public interface LightFuture<T> {
      * @return result of function application.
      * @throws IllegalStateException if thread pool was shut down.
      */
-    <R> LightFuture<R> thenApply(Function<T, R> function);
+    <R> LightFuture<R> thenApply(Function<? super T, ? extends R> function);
 }

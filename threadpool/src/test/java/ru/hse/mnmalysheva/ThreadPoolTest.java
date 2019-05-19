@@ -24,7 +24,7 @@ class ThreadPoolTest {
     }
 
     @AfterEach
-    void shutdown() throws InterruptedException {
+    void shutdown() {
         threadPool.shutdown();
     }
 
@@ -42,7 +42,7 @@ class ThreadPoolTest {
             }));
         }
         for (var future : futures) {
-            future.get();
+            assertEquals(0, future.get().intValue());
         }
         var expected = IntStream.range(0, numberOfTasks).boxed().collect(Collectors.toList());
         assertEquals(expected, results);
@@ -91,7 +91,7 @@ class ThreadPoolTest {
         assertFalse(future.isReady());
         assertFalse(future.isReady());
         assertFalse(future.isReady());
-        future.get();
+        assertEquals("finished", future.get());
         assertTrue(future.isReady());
         assertTrue(future.isReady());
         assertTrue(future.isReady());
@@ -111,9 +111,10 @@ class ThreadPoolTest {
             futures.add(threadPool.submit(new StrictSupplier()));
         }
         for (var future : futures) {
-            results.add(future.get());
-            future.get();
-            future.get();
+            int result = future.get();
+            results.add(result);
+            assertEquals(result, future.get().intValue());
+            assertEquals(result, future.get().intValue());
         }
         Collections.sort(results);
 
@@ -143,9 +144,10 @@ class ThreadPoolTest {
             thread.join();
         }
         for (var future : futures) {
-            results.add(future.get());
-            future.get();
-            future.get();
+            int result = future.get();
+            results.add(result);
+            assertEquals(result, future.get().intValue());
+            assertEquals(result, future.get().intValue());
         }
         Collections.sort(results);
 
@@ -159,9 +161,9 @@ class ThreadPoolTest {
         var future2 = future1.thenApply(a -> a * 11);
         var future3 = future2.thenApply(a -> a + 100);
         var future4 = future3.thenApply(a -> "AAAAA" + a);
-        assertEquals(Integer.valueOf(5), future1.get());
-        assertEquals(Integer.valueOf(55), future2.get());
-        assertEquals(Integer.valueOf(155), future3.get());
+        assertEquals(5, future1.get().intValue());
+        assertEquals(55, future2.get().intValue());
+        assertEquals(155, future3.get().intValue());
         assertEquals("AAAAA155", future4.get());
     }
 
@@ -189,20 +191,20 @@ class ThreadPoolTest {
             return a + 100;
         });
         var future4 = future3.thenApply(a -> "AAAAA" + a);
-        assertEquals(Integer.valueOf(5), future1.get());
-        assertEquals(Integer.valueOf(55), future2.get());
-        assertEquals(Integer.valueOf(155), future3.get());
+        assertEquals(5, future1.get().intValue());
+        assertEquals(55, future2.get().intValue());
+        assertEquals(155, future3.get().intValue());
         assertEquals("AAAAA155", future4.get());
     }
 
     @RepeatedTest(REPEATED_TEST_COUNT)
     void thenApplyAfterExecutionWorksOk() throws LightExecutionException, InterruptedException {
         var future1 = threadPool.submit(() -> 5);
-        assertEquals(Integer.valueOf(5), future1.get());
+        assertEquals(5, future1.get().intValue());
         var future2 = future1.thenApply(a -> a * 11);
-        assertEquals(Integer.valueOf(55), future2.get());
+        assertEquals(55, future2.get().intValue());
         var future3 = future2.thenApply(a -> a + 100);
-        assertEquals(Integer.valueOf(155), future3.get());
+        assertEquals(155, future3.get().intValue());
         var future4 = future3.thenApply(a -> "AAAAA" + a);
         assertEquals("AAAAA155", future4.get());
     }
@@ -237,18 +239,18 @@ class ThreadPoolTest {
         }
         assertFalse(future.isReady());
         for (int i = 0; i < 10; i++) {
-            assertEquals(Integer.valueOf((100 + i) * 100), futures.get(i).get());
+            assertEquals((100 + i) * 100, futures.get(i).get().intValue());
         }
     }
 
     @Test
-    void cannotSubmitAfterShutdown() throws InterruptedException {
+    void cannotSubmitAfterShutdown() {
         threadPool.shutdown();
         assertThrows(IllegalStateException.class, () -> threadPool.submit(() -> 1));
     }
 
     @Test
-    void cannotApplyAfterShutdown() throws InterruptedException {
+    void cannotApplyAfterShutdown() {
         var future1 = threadPool.submit(() -> {
             long result = 0;
             for (int i = 0; i < 100000; i++) {

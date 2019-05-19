@@ -45,13 +45,18 @@ public class ThreadPool {
     /**
      * Shuts down thread pool.
      * All previously submitted tasks are executed, but no new tasks are accepted.
-     * @throws InterruptedException if current thread was interrupted while waiting.
      */
-    public void shutdown() throws InterruptedException {
+    public void shutdown() {
         toFinish = true;
         for (var thread : threads) {
-            thread.interrupt();
-            thread.join();
+            boolean isSuccessful = false;
+            while (!isSuccessful) {
+                try {
+                    thread.interrupt();
+                    thread.join();
+                    isSuccessful = true;
+                } catch (InterruptedException ignored) {}
+            }
         }
     }
 
@@ -80,23 +85,19 @@ public class ThreadPool {
         }
     }
 
-    private class TaskQueue<T> {
+    private static class TaskQueue<T> {
         private final Queue<T> queue = new LinkedList<>();
 
-        private void put(T element) {
-            synchronized (queue) {
-                queue.add(element);
-                queue.notify();
-            }
+        private synchronized void put(T element) {
+            queue.add(element);
+            notify();
         }
 
-        private T get() throws InterruptedException {
-            synchronized (queue) {
-                while (queue.isEmpty()) {
-                    queue.wait();
-                }
-                return queue.remove();
+        private synchronized T get() throws InterruptedException {
+            while (queue.isEmpty()) {
+                wait();
             }
+            return queue.remove();
         }
     }
 
@@ -134,9 +135,9 @@ public class ThreadPool {
         }
 
         @Override
-        public <R> LightFuture<R> thenApply(Function<T, R> function) {
+        public <R> LightFuture<R> thenApply(Function<? super T, ? extends R> function) {
             checkState();
-            var futureTask = new Task<>(() -> function.apply(result));
+            var futureTask = new Task<R>(() -> function.apply(result));
             if (!isReady) {
                 synchronized (readinessLock) {
                     if (!isReady) {

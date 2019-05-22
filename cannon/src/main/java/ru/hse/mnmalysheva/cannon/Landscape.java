@@ -1,0 +1,61 @@
+package ru.hse.mnmalysheva.cannon;
+
+import javafx.geometry.Point2D;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Landscape {
+    private static double EPSILON = 1e-7;
+    private double[] xPoints;
+    private double[] yPoints;
+    private double minimumX;
+    private double maximumX;
+
+    public Landscape(List<Point2D> shape) {
+        xPoints = new double[shape.size()];
+        yPoints = new double[shape.size()];
+        for (int i = 0; i < shape.size(); i++) {
+            var point = shape.get(i);
+            xPoints[i] = point.getX();
+            yPoints[i] = point.getY();
+        }
+        minimumX = xPoints[0];
+        maximumX = xPoints[xPoints.length - 1];
+    }
+
+    public double getY(double x) {
+        int segmentIndex = getSegmentIndex(x);
+        double x1 = xPoints[segmentIndex];
+        double x2 = xPoints[segmentIndex + 1];
+        double y1 = yPoints[segmentIndex];
+        double y2 = yPoints[segmentIndex + 1];
+        return y1 + (y2 - y1) * (x - x1) / (x2 - x1);
+    }
+
+    public Point2D getPoint(double x) {
+        return new Point2D(x, getY(x));
+    }
+
+    public Point2D move(double x, double delta) {
+        if (x + delta < minimumX) {
+            return getPoint(minimumX + EPSILON);
+        }
+        if (x + delta > maximumX) {
+            return getPoint(maximumX - EPSILON);
+        }
+        return getPoint(x + delta);
+    }
+
+    public boolean isUnderLandscape(Point2D point) {
+        return getY(point.getX()) > point.getY();
+    }
+
+    private int getSegmentIndex(double x) {
+        if (x < minimumX || x >= maximumX) {
+            throw new IllegalArgumentException("point is out of landscape");
+        }
+        int index = Arrays.binarySearch(xPoints, x);
+        return index >= 0 ? index : -index - 2;
+    }
+}

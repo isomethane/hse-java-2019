@@ -1,7 +1,10 @@
 package ru.hse.mnmalysheva.cannon;
 
 import javafx.geometry.Point2D;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/** This class represents cannon in Cannon game */
 public class Cannon {
     public static double WHEEL_RADIUS = 10;
     public static double BARREL_LENGTH = 30;
@@ -22,12 +25,13 @@ public class Cannon {
     private boolean isFiring;
     private ProjectileType projectileType = ProjectileType.SMALL;
 
-    public Cannon(Landscape landscape, double locationX, Direction direction) {
+    public Cannon(@NotNull Landscape landscape, double locationX, @NotNull Direction direction) {
         this.landscape = landscape;
         this.location = landscape.getPoint(locationX);
         this.direction = direction;
     }
 
+    /** Updates projectile state with respect to time since last update. **/
     public void update(double deltaTime) {
         if (isMoving) {
             location = landscape.move(
@@ -41,12 +45,13 @@ public class Cannon {
         timeSinceLastFire += deltaTime;
     }
 
-    public Projectile fire() {
+    /** Releases projectile if cannon is able to fire, otherwise return null. **/
+    public @Nullable Projectile fire() {
         if (isFiring && timeSinceLastFire > COOLDOWN) {
             timeSinceLastFire = 0;
             return new Projectile(
                     getBarrelEnd(),
-                    getAngle(),
+                    getBarrelAngle(),
                     projectileType.getSpeed(),
                     projectileType.getRadius(),
                     projectileType.getExplosionRadius()
@@ -55,24 +60,24 @@ public class Cannon {
         return null;
     }
 
-    public Point2D getLocation() {
+    public @NotNull Point2D getLocation() {
         return new Point2D(location.getX(), location.getY() + WHEEL_RADIUS);
     }
 
-    public Point2D getBarrelEnd() {
+    public @NotNull Point2D getBarrelEnd() {
         var location = getLocation();
-        var angle = getAngle();
+        var angle = getBarrelAngle();
         return new Point2D(
                 location.getX() + BARREL_LENGTH * Math.cos(angle),
                 location.getY() + BARREL_LENGTH * Math.sin(angle)
         );
     }
 
-    public void setDirection(Direction direction) {
+    public void setDirection(@NotNull Direction direction) {
         this.direction = direction;
     }
 
-    public double getAngle() {
+    public double getBarrelAngle() {
         return direction == Direction.RIGHT ? angle : Math.PI - angle;
     }
 
@@ -80,7 +85,7 @@ public class Cannon {
         isMoving = moving;
     }
 
-    public void setRotateDirection(RotateDirection rotateDirection) {
+    public void setRotateDirection(@NotNull RotateDirection rotateDirection) {
         this.rotateDirection = rotateDirection;
     }
 
@@ -88,7 +93,7 @@ public class Cannon {
         isFiring = firing;
     }
 
-    public void setProjectileType(ProjectileType projectileType) {
+    public void setProjectileType(@NotNull ProjectileType projectileType) {
         this.projectileType = projectileType;
     }
 

@@ -1,7 +1,9 @@
 package ru.hse.mnmalysheva.cannon;
 
 import javafx.geometry.Point2D;
+import org.jetbrains.annotations.NotNull;
 
+/** This class represents projectile in Cannon game. **/
 public class Projectile {
     private static final double GRAVITY_ACCELERATION = 350;
     private final double initialX;
@@ -14,7 +16,15 @@ public class Projectile {
     private Point2D location;
     private double time;
 
-    public Projectile(Point2D location, double angle, double speed, double radius, double explosionRadius) {
+    /**
+     * Constructs new projectile.
+     * @param location initial location in pixels.
+     * @param angle initial direction.
+     * @param speed initial speed in pixels/second.
+     * @param radius initial radius in pixels.
+     * @param explosionRadius explosion radius in pixels.
+     */
+    public Projectile(@NotNull Point2D location, double angle, double speed, double radius, double explosionRadius) {
         initialX = location.getX();
         initialY = location.getY();
         initialSpeedX = speed * Math.cos(angle);
@@ -23,6 +33,7 @@ public class Projectile {
         this.explosionRadius = explosionRadius;
     }
 
+    /** Update location with respect to time since last update. **/
     public void update(double deltaTime) {
         time += deltaTime;
         double x = initialX + initialSpeedX * time;
@@ -30,7 +41,7 @@ public class Projectile {
         location = new Point2D(x, y);
     }
 
-    public Point2D getLocation() {
+    public @NotNull Point2D getLocation() {
         return location;
     }
 

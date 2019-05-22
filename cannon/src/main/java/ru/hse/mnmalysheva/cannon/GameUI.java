@@ -14,9 +14,11 @@ import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+/** This class represents Cannon game UI. **/
 public class GameUI extends Application {
     private GraphicsContext graphicsContext;
     private double[] landscapeX;
@@ -59,8 +61,14 @@ public class GameUI extends Application {
         game.setTarget(target);
     }
 
+    /** Start program. **/
+    public static void main(@NotNull String[] args) {
+        Application.launch(args);
+    }
+
+    /** Initialize stage. **/
     @Override
-    public void start(Stage primaryStage) {
+    public void start(@NotNull Stage primaryStage) {
         var canvas = new Canvas(Game.WIDTH, Game.HEIGHT);
         graphicsContext = canvas.getGraphicsContext2D();
         var root = new Group(canvas);
@@ -183,10 +191,6 @@ public class GameUI extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        Application.launch(args);
     }
 
     private void drawGame() {

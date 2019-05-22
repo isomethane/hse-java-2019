@@ -1,10 +1,13 @@
 package ru.hse.mnmalysheva.cannon;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/** This class represents Cannon game logic. **/
 public class Game {
     public static double WIDTH = 1280;
     public static double HEIGHT = 720;
@@ -19,6 +22,7 @@ public class Game {
         this.landscape = landscape;
     }
 
+    /** Updates game state with respect to time since last update. **/
     public void update(double deltaTime) {
         for (var c : cannons) {
             c.update(deltaTime);
@@ -52,25 +56,25 @@ public class Game {
         }
     }
 
-    public Cannon addCannon(double locationX, Cannon.Direction direction) {
+    public Cannon addCannon(double locationX, @NotNull Cannon.Direction direction) {
         var cannon = new Cannon(landscape, locationX, direction);
         cannons.add(cannon);
         return cannon;
     }
 
-    public Set<Projectile> getProjectiles() {
+    public @NotNull Set<Projectile> getProjectiles() {
         return projectiles;
     }
 
-    public List<Projectile> getExplodedProjectiles() {
+    public @NotNull List<Projectile> getExplodedProjectiles() {
         return explodedProjectiles;
     }
 
-    public Target getTarget() {
+    public @NotNull Target getTarget() {
         return target;
     }
 
-    public void setTarget(Target target) {
+    public void setTarget(@NotNull Target target) {
         this.target = target;
     }
 

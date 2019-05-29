@@ -42,9 +42,7 @@ class PairGameTest {
             gameLogger.append("non matching: ");
             printTwoCells(first, second);
         });
-        game.setOnReleaseListener((first, second) -> {
-            gameLogger.append("released\n");
-        });
+        game.setOnReleaseListener((first, second) -> gameLogger.append("released\n"));
         game.setOnGameEndedListener(() -> gameLogger.append("game ended\n"));
     }
 

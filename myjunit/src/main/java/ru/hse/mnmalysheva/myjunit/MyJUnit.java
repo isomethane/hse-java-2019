@@ -34,7 +34,7 @@ public class MyJUnit {
         var methods = new ArrayList<>(Arrays.asList(testClass.getMethods()));
         methods.sort(Comparator.comparing(Method::getName));
 
-        for (var method : testClass.getMethods()) {
+        for (var method : methods) {
             if (method.getAnnotation(BeforeClass.class) != null) {
                 beforeClassMethods.add(method);
             }

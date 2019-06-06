@@ -32,3 +32,11 @@ test {
         events "started", "passed", "skipped", "failed"
     }
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}

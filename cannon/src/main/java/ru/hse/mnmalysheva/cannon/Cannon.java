@@ -31,7 +31,7 @@ public class Cannon {
         this.direction = direction;
     }
 
-    /** Updates projectile state with respect to time since last update. **/
+    /** Updates cannon state with respect to time since last update. **/
     public void update(double deltaTime) {
         if (isMoving) {
             location = landscape.move(

@@ -4,7 +4,6 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -20,9 +19,27 @@ import java.util.*;
 
 /** This class represents Cannon game UI. **/
 public class GameUI extends Application {
+    private static final String SMALL_PROJECTILE_BUTTON = "Small";
+    private static final String MEDIUM_PROJECTILE_BUTTON = "Medium";
+    private static final String LARGE_PROJECTILE_BUTTON = "Large";
+    private static final double NANOSECONDS_IN_SECOND = 1_000_000_000;
+    private static final List<Point2D> LANDSCAPE_POINTS = List.of(
+            new Point2D(0, 100),
+            new Point2D(150, 200),
+            new Point2D(270, 120),
+            new Point2D(500, 300),
+            new Point2D(580, 110),
+            new Point2D(620, 90),
+            new Point2D(790, 350),
+            new Point2D(1010, 140),
+            new Point2D(1150, 220),
+            new Point2D(1280, 130)
+    );
+
     private GraphicsContext graphicsContext;
     private double[] landscapeX;
     private double[] landscapeY;
+
     private Game game;
     private Cannon cannon;
     private Target target;
@@ -32,33 +49,12 @@ public class GameUI extends Application {
     private long previousTime;
 
     {
-        var landscapePoints = List.of(
-                new Point2D(0, 100),
-                new Point2D(150, 200),
-                new Point2D(270, 120),
-                new Point2D(500, 300),
-                new Point2D(580, 110),
-                new Point2D(620, 90),
-                new Point2D(790, 350),
-                new Point2D(1010, 140),
-                new Point2D(1150, 220),
-                new Point2D(1280, 130)
-        );
-        landscapeX = new double[landscapePoints.size() + 2];
-        landscapeY = new double[landscapePoints.size() + 2];
-        landscapeX[0] = Game.WIDTH;
-        landscapeY[0] = Game.HEIGHT;
-        landscapeX[1] = 0;
-        landscapeY[1] = Game.HEIGHT;
-        for (int i = 0; i < landscapePoints.size(); i++) {
-            landscapeX[i + 2] = landscapePoints.get(i).getX();
-            landscapeY[i + 2] = Game.HEIGHT - landscapePoints.get(i).getY();
-        }
-
-        game = new Game(new Landscape(landscapePoints));
+        game = new Game(new Landscape(LANDSCAPE_POINTS));
         cannon = game.addCannon(150, Cannon.Direction.RIGHT);
         target = new Target(new Point2D(1150, 230), 10);
         game.setTarget(target);
+
+        initLandscapePolygonByPoints();
     }
 
     /** Start program. **/
@@ -70,85 +66,67 @@ public class GameUI extends Application {
     @Override
     public void start(@NotNull Stage primaryStage) {
         var canvas = new Canvas(Game.WIDTH, Game.HEIGHT);
-        graphicsContext = canvas.getGraphicsContext2D();
         var root = new Group(canvas);
+        var scene = new Scene(root);
 
-        var buttons = new ListView<>(FXCollections.observableList(List.of("Small", "Medium", "Large")));
-        root.getChildren().add(buttons);
+        graphicsContext = canvas.getGraphicsContext2D();
 
-        buttons.setOnMouseClicked(event -> {
-            switch (buttons.getSelectionModel().getSelectedIndex()) {
-                case 0:
-                    cannon.setProjectileType(ProjectileType.SMALL);
-                    break;
-                case 1:
-                    cannon.setProjectileType(ProjectileType.MEDIUM);
-                    break;
-                case 2:
-                    cannon.setProjectileType(ProjectileType.LARGE);
-                    break;
-                default:
-                    break;
-            }
-        });
+        initButtons(root);
+        initKeyHandlers(scene);
+        initAnimationTimer(primaryStage);
+
+        primaryStage.setTitle("Cannon");
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    private void initLandscapePolygonByPoints() {
+        landscapeX = new double[LANDSCAPE_POINTS.size() + 2];
+        landscapeY = new double[LANDSCAPE_POINTS.size() + 2];
+        landscapeX[0] = Game.WIDTH;
+        landscapeY[0] = Game.HEIGHT;
+        landscapeX[1] = 0;
+        landscapeY[1] = Game.HEIGHT;
+        for (int i = 0; i < LANDSCAPE_POINTS.size(); i++) {
+            landscapeX[i + 2] = LANDSCAPE_POINTS.get(i).getX();
+            landscapeY[i + 2] = Game.HEIGHT - LANDSCAPE_POINTS.get(i).getY();
+        }
+    }
+
+    private void initButtons(Group root) {
+        var buttons = new ListView<>(FXCollections.observableArrayList(
+                SMALL_PROJECTILE_BUTTON,
+                MEDIUM_PROJECTILE_BUTTON,
+                LARGE_PROJECTILE_BUTTON
+        ));
+
         final int ROW_HEIGHT = 24;
         buttons.setPrefHeight(ROW_HEIGHT * 3 + 2);
         buttons.setPrefWidth(100);
         buttons.getSelectionModel().select(0);
         buttons.setFocusTraversable(false);
 
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (previousTime == 0) {
-                    previousTime = now;
-                    return;
-                }
-
-                double deltaTime = (now - previousTime) * 1e-9;
-                game.update(deltaTime);
-                previousTime = now;
-
-                var exploded = game.getExplodedProjectiles();
-                for (var e : exploded) {
-                    explosions.add(new Explosion(e.getLocation(), 10 + e.getExplosionRadius()));
-                }
-                exploded.clear();
-
-                List<Explosion> toDelete = new ArrayList<>();
-                for (var e : explosions) {
-                    e.update(deltaTime);
-                    if (e.isDead()) {
-                        toDelete.add(e);
-                    }
-                }
-                for (var e : toDelete) {
-                    explosions.remove(e);
-                }
-
-                drawGame();
-
-                if (!gameEnded && game.getGameState() == Game.GameState.WIN) {
-                    gameEnded = true;
-                    cannon.setMoving(false);
-                    cannon.setRotateDirection(Cannon.RotateDirection.NO);
-                    cannon.setFiring(false);
-
-                    var alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("You win");
-                    alert.setContentText("Congratulations!");
-                    alert.initModality(Modality.APPLICATION_MODAL);
-                    alert.initOwner(primaryStage);
-                    alert.show();
-                    alert.setOnHidden(e -> Platform.exit());
-                }
+        buttons.setOnMouseClicked(event -> {
+            switch (buttons.getSelectionModel().getSelectedItem()) {
+                case SMALL_PROJECTILE_BUTTON:
+                    cannon.setProjectileType(ProjectileType.SMALL);
+                    break;
+                case MEDIUM_PROJECTILE_BUTTON:
+                    cannon.setProjectileType(ProjectileType.MEDIUM);
+                    break;
+                case LARGE_PROJECTILE_BUTTON:
+                    cannon.setProjectileType(ProjectileType.LARGE);
+                    break;
+                default:
+                    break;
             }
-        };
+        });
 
-        timer.start();
+        root.getChildren().add(buttons);
+    }
 
-        var scene = new Scene(root);
-
+    private void initKeyHandlers(Scene scene) {
         scene.setOnKeyPressed(e -> {
             switch (e.getCode()) {
                 case LEFT:
@@ -186,11 +164,68 @@ public class GameUI extends Application {
                     break;
             }
         });
+    }
 
-        primaryStage.setTitle("Cannon");
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
+    private void initAnimationTimer(Stage primaryStage) {
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (previousTime == 0) {
+                    previousTime = now;
+                    return;
+                }
+                double deltaTime = (now - previousTime) / NANOSECONDS_IN_SECOND;
+                previousTime = now;
+
+                game.update(deltaTime);
+                registerExplosions();
+                updateExplosions(deltaTime);
+
+                drawGame();
+
+                if (!gameEnded && game.getGameState() == Game.GameState.WIN) {
+                    endGame(primaryStage);
+                }
+            }
+        };
+
+        timer.start();
+    }
+
+    private void registerExplosions() {
+        var exploded = game.getExplodedProjectiles();
+        for (var e : exploded) {
+            explosions.add(new Explosion(e.getLocation(), 10 + e.getExplosionRadius()));
+        }
+        exploded.clear();
+    }
+
+    private void updateExplosions(double deltaTime) {
+        List<Explosion> toDelete = new ArrayList<>();
+        for (var e : explosions) {
+            e.update(deltaTime);
+            if (e.isDead()) {
+                toDelete.add(e);
+            }
+        }
+        for (var e : toDelete) {
+            explosions.remove(e);
+        }
+    }
+
+    private void endGame(Stage primaryStage) {
+        gameEnded = true;
+        cannon.setMoving(false);
+        cannon.setRotateDirection(Cannon.RotateDirection.NO);
+        cannon.setFiring(false);
+
+        var alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("You win");
+        alert.setContentText("Congratulations!");
+        alert.initModality(Modality.APPLICATION_MODAL);
+        alert.initOwner(primaryStage);
+        alert.show();
+        alert.setOnHidden(e -> Platform.exit());
     }
 
     private void drawGame() {
@@ -256,12 +291,6 @@ public class GameUI extends Application {
         }
     }
 
-    private void drawExplosions() {
-        for (var e : explosions) {
-            e.draw();
-        }
-    }
-
     private void drawTarget() {
         var location = target.getLocation();
         var radius = target.getRadius();
@@ -285,54 +314,35 @@ public class GameUI extends Application {
         );
     }
 
-    private class Explosion {
-        private static final double LIFE_TIME = 0.8;
-        private static final double FADE_AWAY_TIME = 0.4;
-        private final Point2D location;
-        private final double maximumRadius;
-        private double time;
-
-        private Explosion(Point2D location, double maximumRadius) {
-            this.location = location;
-            this.maximumRadius = maximumRadius;
+    private void drawExplosions() {
+        for (var e : explosions) {
+            drawExplosion(e);
         }
+    }
 
-        private void update(double deltaTime) {
-            time += deltaTime;
-        }
+    private void drawExplosion(Explosion explosion) {
+        double x = explosion.location.getX();
+        double y = explosion.location.getY();
+        double radius = explosion.getCurrentRadius();
+        double alpha = explosion.getCurrentOpacity();
 
-        private boolean isDead() {
-            return time > LIFE_TIME + FADE_AWAY_TIME;
-        }
-
-        private void draw() {
-            double radius;
-            double alpha;
-            if (time < LIFE_TIME) {
-                radius = maximumRadius * time / LIFE_TIME;
-                alpha = 1;
-            } else {
-                radius = maximumRadius;
-                alpha = 1 - (time - LIFE_TIME) / FADE_AWAY_TIME;
-            }
-            var gradient = new RadialGradient(
-                    0,
-                    0,
-                    location.getX(),
-                    Game.HEIGHT - location.getY(),
-                    radius,
-                    false,
-                    CycleMethod.NO_CYCLE,
-                    new Stop(0, Color.color(1.0, 0.3, 0.0, alpha)),
-                    new Stop(1, Color.TRANSPARENT)
-            );
-            graphicsContext.setFill(gradient);
-            graphicsContext.fillOval(
-                    location.getX() - radius,
-                    Game.HEIGHT - location.getY() - radius,
-                    radius * 2,
-                    radius * 2
-            );
-        }
+        var gradient = new RadialGradient(
+                0,
+                0,
+                x,
+                Game.HEIGHT - y,
+                radius,
+                false,
+                CycleMethod.NO_CYCLE,
+                new Stop(0, Color.color(1.0, 0.3, 0.0, alpha)),
+                new Stop(1, Color.TRANSPARENT)
+        );
+        graphicsContext.setFill(gradient);
+        graphicsContext.fillOval(
+                x - radius,
+                Game.HEIGHT - y - radius,
+                radius * 2,
+                radius * 2
+        );
     }
 }

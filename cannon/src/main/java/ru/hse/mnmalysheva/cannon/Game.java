@@ -70,10 +70,6 @@ public class Game {
         return explodedProjectiles;
     }
 
-    public @NotNull Target getTarget() {
-        return target;
-    }
-
     public void setTarget(@NotNull Target target) {
         this.target = target;
     }
@@ -83,6 +79,6 @@ public class Game {
     }
 
     public enum GameState {
-        IN_PROGRESS, WIN, LOSE
+        IN_PROGRESS, WIN
     }
 }

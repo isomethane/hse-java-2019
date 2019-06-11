@@ -3,7 +3,6 @@ package ru.hse.mnmalysheva.ftpgui;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +11,19 @@ class FTPUtils {
     private static int INCORRECT_INPUT_CODE = -1;
     private static int BUFFER_SIZE = 1024;
 
-    static Query readQuery(DataInputStream in) throws IOException {
+    static FTPQuery readQuery(DataInputStream in) throws IOException {
         int queryCode = in.readInt();
         String path = in.readUTF();
-        return new Query(QueryType.fromCode(queryCode), path);
+        return new FTPQuery(FTPQueryType.fromCode(queryCode), path);
     }
 
-    static void writeQuery(Query query, DataOutputStream out) throws IOException {
+    static void writeQuery(FTPQuery query, DataOutputStream out) throws IOException {
         out.writeInt(query.type.getCode());
         out.writeUTF(query.path);
     }
 
-    static void executeQuery(Query query, DataOutputStream out) throws IOException {
-        if (query.type == QueryType.LIST) {
+    static void executeQuery(FTPQuery query, DataOutputStream out) throws IOException {
+        if (query.type == FTPQueryType.LIST) {
             FTPUtils.writeDirectory(Path.of(query.path), out);
         } else {
             FTPUtils.writeFile(Path.of(query.path), out);

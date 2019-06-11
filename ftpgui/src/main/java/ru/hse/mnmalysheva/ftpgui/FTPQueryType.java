@@ -1,11 +1,11 @@
 package ru.hse.mnmalysheva.ftpgui;
 
-public enum QueryType {
+public enum FTPQueryType {
     LIST(1), GET(2);
 
     private final int code;
 
-    QueryType(int code) {
+    FTPQueryType(int code) {
         this.code = code;
     }
 
@@ -13,7 +13,7 @@ public enum QueryType {
         return code;
     }
 
-    static QueryType fromCode(int code) {
+    static FTPQueryType fromCode(int code) {
         if (code == LIST.code) {
             return LIST;
         }

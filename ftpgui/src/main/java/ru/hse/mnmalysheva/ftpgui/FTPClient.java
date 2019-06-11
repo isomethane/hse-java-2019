@@ -68,7 +68,7 @@ public class FTPClient {
      * @throws IOException if I/O error occurred when communicating with server.
      */
     public @Nullable List<FileDescription> executeList(@NotNull String path) throws IOException {
-        FTPUtils.writeQuery(new Query(QueryType.LIST, path), out);
+        FTPUtils.writeQuery(new FTPQuery(FTPQueryType.LIST, path), out);
         return FTPUtils.readDirectory(in);
     }
 
@@ -80,7 +80,7 @@ public class FTPClient {
      * @throws IOException if I/O error occurred when communicating with server.
      */
     public void executeGet(@NotNull String path, OutputStream destination) throws IOException {
-        FTPUtils.writeQuery(new Query(QueryType.GET, path), out);
+        FTPUtils.writeQuery(new FTPQuery(FTPQueryType.GET, path), out);
         FTPUtils.readFile(in, destination);
     }
 }

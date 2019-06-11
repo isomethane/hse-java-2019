@@ -62,7 +62,7 @@ public class FTPServer {
         public void run() {
             while (true) {
                 try {
-                    Query query = FTPUtils.readQuery(in);
+                    FTPQuery query = FTPUtils.readQuery(in);
                     FTPUtils.executeQuery(query, out);
                 } catch (IOException e) {
                     return;

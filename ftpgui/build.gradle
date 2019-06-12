@@ -5,11 +5,11 @@ plugins {
 }
 
 javafx {
-    version = "12"
-    modules = [ 'javafx.controls', 'javafx.graphics' ]
+    version = '12'
+    modules = [ 'javafx.controls' ]
 }
 
-mainClassName = System.getProperty("mainClass")
+mainClassName = "ru.hse.mnmalysheva.ftpgui.FTPClientGUI"
 
 group 'ru.hse.mnmalysheva'
 version '1.0-SNAPSHOT'
@@ -30,5 +30,19 @@ test {
     useJUnitPlatform()
     testLogging {
         events "started", "passed", "skipped", "failed"
+    }
+}
+
+task runServer(type: JavaExec) {
+    standardInput = System.in
+    classpath sourceSets.main.runtimeClasspath
+    main = 'ru.hse.mnmalysheva.ftpgui.FTPServerCLI'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ru.hse.mnmalysheva.ftpgui.FTPClientGUI'
+    } from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }

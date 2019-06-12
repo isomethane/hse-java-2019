@@ -39,14 +39,11 @@ class FTPUtils {
         }
         byte[] buffer = new byte[BUFFER_SIZE];
         long bytesLeft = size;
-        while (bytesLeft >= 0) {
+        while (bytesLeft > 0) {
             int toRead = (int) Math.min(BUFFER_SIZE, bytesLeft);
             int bytesRead = in.read(buffer, 0, toRead);
-            if (bytesRead != toRead) {
-                throw new RuntimeException();
-            }
             destination.write(buffer, 0, bytesRead);
-            bytesLeft -= BUFFER_SIZE;
+            bytesLeft -= bytesRead;
         }
     }
 

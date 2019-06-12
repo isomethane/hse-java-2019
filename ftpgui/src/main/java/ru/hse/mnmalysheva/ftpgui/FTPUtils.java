@@ -1,5 +1,6 @@
 package ru.hse.mnmalysheva.ftpgui;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -11,18 +12,19 @@ class FTPUtils {
     private static int INCORRECT_INPUT_CODE = -1;
     private static int BUFFER_SIZE = 1024;
 
-    static FTPQuery readQuery(DataInputStream in) throws IOException {
+    static FTPQuery readQuery(@NotNull DataInputStream in) throws IOException {
         int queryCode = in.readInt();
         String path = in.readUTF();
         return new FTPQuery(FTPQueryType.fromCode(queryCode), path);
     }
 
-    static void writeQuery(FTPQuery query, DataOutputStream out) throws IOException {
+
+    static void writeQuery(@NotNull FTPQuery query, @NotNull DataOutputStream out) throws IOException {
         out.writeInt(query.type.getCode());
         out.writeUTF(query.path);
     }
 
-    static void executeQuery(FTPQuery query, DataOutputStream out) throws IOException {
+    static void executeQuery(@NotNull FTPQuery query, @NotNull DataOutputStream out) throws IOException {
         if (query.type == FTPQueryType.LIST) {
             FTPUtils.writeDirectory(Path.of(query.path), out);
         } else {
@@ -30,7 +32,7 @@ class FTPUtils {
         }
     }
 
-    static void readFile(DataInputStream in, OutputStream destination) throws IOException {
+    static void readFile(@NotNull DataInputStream in, @NotNull OutputStream destination) throws IOException {
         long size = in.readLong();
         if (size == INCORRECT_INPUT_CODE) {
             throw new FileNotFoundException();
@@ -48,7 +50,7 @@ class FTPUtils {
         }
     }
 
-    static @Nullable List<FileDescription> readDirectory(DataInputStream in) throws IOException {
+    static @Nullable List<FileDescription> readDirectory(@NotNull DataInputStream in) throws IOException {
         int size = in.readInt();
         if (size == INCORRECT_INPUT_CODE) {
             return null;
@@ -62,7 +64,7 @@ class FTPUtils {
         return result;
     }
 
-    static void writeFile(Path path, DataOutputStream out) throws IOException {
+    private static void writeFile(@NotNull Path path, @NotNull DataOutputStream out) throws IOException {
         var file = path.toFile();
         if (!file.isFile()) {
             out.writeLong(INCORRECT_INPUT_CODE);
@@ -78,7 +80,7 @@ class FTPUtils {
         }
     }
 
-    static void writeDirectory(Path path, DataOutputStream out) throws IOException {
+    private static void writeDirectory(@NotNull Path path, @NotNull DataOutputStream out) throws IOException {
         var directory = path.toFile();
         if (!directory.isDirectory()) {
             out.writeLong(INCORRECT_INPUT_CODE);

@@ -8,22 +8,42 @@ import java.net.SocketException;
 public class FTPServer {
     private int port;
     private ServerSocket server;
+    private boolean isRunning;
 
+    /** Returns {@code true} if server is running. **/
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * Starts server at specified port.
+     * @param port port number
+     * @throws IllegalStateException if server is already running.
+     * @throws IOException if I/O error occurred when creating server socket.
+     */
     public void start(int port) throws IOException {
-        stop();
-
+        if (isRunning) {
+            throw new IllegalStateException("Server is already running");
+        }
         this.port = port;
         server = new ServerSocket(port);
         new Thread(new ServerSocketWorker(server)).start();
+        isRunning = true;
     }
 
+    /**
+     * Stops server.
+     * @throws IOException if an I/O error occurred when closing server socket.
+     */
     public void stop() throws IOException {
-        if (server != null) {
+        if (isRunning) {
+            isRunning = false;
             server.close();
             server = null;
         }
     }
 
+    /** Returns server port. **/
     public int getPort() {
         return port;
     }

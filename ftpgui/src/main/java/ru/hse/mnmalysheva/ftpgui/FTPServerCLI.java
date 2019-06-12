@@ -34,6 +34,8 @@ public class FTPServerCLI {
                             System.out.println("Server started");
                         } catch (NumberFormatException e) {
                             System.out.println("Port is not a correct number");
+                        } catch (IllegalStateException e) {
+                            System.out.println("Server is already running");
                         } catch (IOException e) {
                             System.out.println("Failed to start server :(");
                         }

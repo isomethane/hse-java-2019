@@ -17,8 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
 
+/** FTPClient user interface. **/
 public class FTPClientGUI extends Application {
     private FTPClient client = new FTPClient();
     private File path;
@@ -30,10 +33,12 @@ public class FTPClientGUI extends Application {
     private Button disconnectButton;
     private Stage primaryStage;
 
+    /** Starts program. **/
     public static void main(@NotNull String[] args) {
         Application.launch(args);
     }
 
+    /** Initializes stage. **/
     @Override
     public void start(@NotNull Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -172,14 +177,12 @@ public class FTPClientGUI extends Application {
 
         @Override
         protected void succeeded() {
-            super.succeeded();
             showAlert("Disconnected");
             menuSetDisable(false);
         }
 
         @Override
         protected void failed() {
-            super.failed();
             showAlert("Failed to disconnect");
             menuSetDisable(false);
         }
@@ -197,14 +200,21 @@ public class FTPClientGUI extends Application {
         }
 
         @Override
-        protected Void call() throws Exception {
+        protected Void call() throws IOException {
             files = client.executeList(newPath.getPath());
+            if (files != null) {
+                files.sort((a, b) -> {
+                    if (a.isDirectory) {
+                        return b.isDirectory ? a.name.compareTo(b.name) : -1;
+                    }
+                    return b.isDirectory ? 1 : a.name.compareTo(b.name);
+                });
+            }
             return null;
         }
 
         @Override
         protected void succeeded() {
-            super.succeeded();
             if (files == null) {
                 showAlert("Not a directory");
             } else {
@@ -218,7 +228,6 @@ public class FTPClientGUI extends Application {
 
         @Override
         protected void failed() {
-            super.failed();
             showAlert("Failed to execute list task");
             menuSetDisable(false);
         }
@@ -227,38 +236,50 @@ public class FTPClientGUI extends Application {
     private class ExecuteGetTask extends Task<Void> {
         private File fromFile;
         private File toFile;
+        private boolean toDownload = true;
 
         private ExecuteGetTask(@NotNull String fileName) {
             var directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Choose directory to save");
             File directory = directoryChooser.showDialog(primaryStage);
-
-            fromFile = new File(path, fileName);
-            toFile = new File(directory, fileName);
+            if (directory != null) {
+                fromFile = new File(path, fileName);
+                toFile = new File(directory, fileName);
+            } else {
+                toDownload = false;
+            }
 
             menuSetDisable(true);
         }
 
         @Override
-        protected Void call() throws Exception {
-            if (toFile.createNewFile()) {
-                var out = new FileOutputStream(toFile);
-                client.executeGet(fromFile.getPath(), out);
+        protected Void call() throws IOException {
+            if (toDownload) {
+                if (toFile.createNewFile()) {
+                    var out = new FileOutputStream(toFile);
+                    client.executeGet(fromFile.getPath(), out);
+                } else {
+                    throw new FileAlreadyExistsException(toFile.getName());
+                }
             }
             return null;
         }
 
         @Override
         protected void succeeded() {
-            super.succeeded();
-            showAlert("Downloaded file");
+            if (toDownload) {
+                showAlert("Downloaded file");
+            }
             menuSetDisable(false);
         }
 
         @Override
         protected void failed() {
-            super.failed();
-            showAlert("Failed to download file");
+            if (getException() instanceof FileAlreadyExistsException) {
+                showAlert("File with such name already exists");
+            } else {
+                showAlert("Failed to download file");
+            }
             menuSetDisable(false);
         }
     }

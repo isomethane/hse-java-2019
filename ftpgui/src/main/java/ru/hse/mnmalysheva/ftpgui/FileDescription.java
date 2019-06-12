@@ -16,6 +16,6 @@ public class FileDescription {
 
     @Override
     public @NotNull String toString() {
-        return name;
+        return (isDirectory ? "" : "⤓ ") + name;
     }
 }
